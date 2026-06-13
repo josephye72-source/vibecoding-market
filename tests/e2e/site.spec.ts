@@ -525,6 +525,52 @@ test("split console demo calculates immediately, blocks invalid input, and copie
   await expect(page.getByRole("button", { name: /Copy summary/i })).toBeDisabled();
 });
 
+test("split console copy action has a distinct disabled affordance before valid input", async ({
+  page
+}) => {
+  await page.goto("/#/projects/split-console/demo");
+
+  const copy = page.getByRole("button", { name: /Copy summary/i });
+  await expect(copy).toBeDisabled();
+
+  const disabledStyle = await copy.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+
+    return {
+      backgroundColor: style.backgroundColor,
+      boxShadow: style.boxShadow,
+      color: style.color,
+      cursor: style.cursor
+    };
+  });
+
+  await page.getByLabel("Total").fill("90");
+  await page.getByLabel("Participants").fill("Ava, Bo, Cy");
+  await expect(copy).toBeEnabled();
+  await expect
+    .poll(() => copy.evaluate((element) => window.getComputedStyle(element).backgroundColor))
+    .not.toBe(disabledStyle.backgroundColor);
+  await expect
+    .poll(() => copy.evaluate((element) => window.getComputedStyle(element).boxShadow))
+    .not.toBe(disabledStyle.boxShadow);
+
+  const enabledStyle = await copy.evaluate((element) => {
+    const style = window.getComputedStyle(element);
+
+    return {
+      backgroundColor: style.backgroundColor,
+      boxShadow: style.boxShadow,
+      color: style.color,
+      cursor: style.cursor
+    };
+  });
+
+  expect(disabledStyle.color).not.toBe("rgba(0, 0, 0, 0)");
+  expect(disabledStyle.cursor).toBe("not-allowed");
+  expect(disabledStyle.backgroundColor).not.toBe(enabledStyle.backgroundColor);
+  expect(disabledStyle.boxShadow).not.toBe(enabledStyle.boxShadow);
+});
+
 test("split console reports when clipboard copy is unavailable", async ({ page }) => {
   await page.addInitScript(() => {
     window.__VCM_CLIPBOARD_WRITE__ = () => Promise.reject(new Error("blocked"));

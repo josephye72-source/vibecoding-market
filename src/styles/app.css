@@ -194,6 +194,24 @@
   transform: translateY(1px);
 }
 
+.button:disabled,
+.button[disabled] {
+  background: rgb(255 255 255 / 10%);
+  border-color: rgb(255 255 255 / 18%);
+  box-shadow: none;
+  color: rgb(247 241 223 / 76%);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button:disabled:hover,
+.button[disabled]:hover,
+.button:disabled:active,
+.button[disabled]:active {
+  border-color: rgb(255 255 255 / 18%);
+  transform: none;
+}
+
 .positioning-tags,
 .skill-tags {
   display: flex;

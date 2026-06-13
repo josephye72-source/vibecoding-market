@@ -31,10 +31,12 @@ Guideline source: https://raw.githubusercontent.com/vercel-labs/web-interface-gu
 - Keyboard focus reached the homepage primary CTA and each demo main control.
 - All core demo controls were visible and clickable at mobile and desktop sizes.
 - The tested form inputs in Tiny Ledger and Split Console were label-addressable.
+- Follow-up controller QA found a state clarity issue: Split Console's disabled `Copy summary` action was programmatically disabled, but visually looked like an enabled primary button.
 
 ## Fixes Made
 
-No accessibility fixes were required after the new Task 7 tests were added. The expanded Playwright run passed immediately with the existing implementation.
+- Added disabled button affordance styling so unavailable actions are visually distinct while text remains readable.
+- Added Playwright coverage for the initial Split Console disabled copy state and its computed disabled affordance.
 
 ## Remaining Accepted Risks
 
