@@ -94,7 +94,7 @@ Create an e2e smoke test that expects the site to render the homepage title and 
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npx playwright test
 ```
 
@@ -120,7 +120,7 @@ Run:
 
 ```powershell
 npm install
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright install chromium
 npx playwright test
@@ -196,7 +196,7 @@ Implement tokens and baseline styles:
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 ```
 
@@ -241,7 +241,7 @@ Add tests for:
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npx playwright test tests/e2e/site.spec.ts
 ```
 
@@ -264,7 +264,7 @@ Use code-native links, buttons, and text. Do not create a marketing landing page
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright test
 ```
@@ -312,7 +312,7 @@ Test:
 Run:
 
 ```powershell
-npm test -- --run src/demos/pomodoro/logic.test.ts
+npm run test:run -- src/demos/pomodoro/logic.test.ts
 ```
 
 Expected:
@@ -340,7 +340,7 @@ Docs must satisfy V1 Spec sections 6.5, 6.6, 7, and 8.1.
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright test
 ```
@@ -381,7 +381,7 @@ Test the exact project-level criteria in V1 Spec sections 8.2-8.5.
 Run:
 
 ```powershell
-npm test -- --run src/demos
+npm run test:run -- src/demos
 ```
 
 Expected:
@@ -414,7 +414,7 @@ Each FAQ must include at least 5 issues. Each remix doc must include light, medi
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright test
 ```
@@ -454,7 +454,7 @@ Test:
 Run:
 
 ```powershell
-npm test -- --run src/data
+npm run test:run -- src/data
 ```
 
 Expected:
@@ -476,7 +476,7 @@ Ensure every project has:
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright test
 ```
@@ -548,7 +548,7 @@ Review docs must record:
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright test
 ```
@@ -599,7 +599,7 @@ Default feedback channel is GitHub Issue, with social topic fallback.
 Run:
 
 ```powershell
-npm test -- --run
+npm run test:run
 npm run build
 npx playwright test
 git status --short
