@@ -64,11 +64,12 @@ for (const project of projects) {
     await expect(page.locator(`a[href="${linksFor(project).docs ?? ""}"]`)).toBeVisible();
   });
 
+}
+
+for (const project of projects.filter((project) => project.slug !== "focus-pomodoro")) {
   test(`demo route for ${project.title} renders implementation pending state`, async ({
     page
   }) => {
-    test.skip(project.slug === "focus-pomodoro", "Focus Pomodoro has a real Task 4 demo.");
-
     const links = linksFor(project);
 
     await page.goto(`/${links.demo ?? `#/projects/${project.slug}/demo`}`);
@@ -79,7 +80,10 @@ for (const project of projects) {
 }
 
 test("focus pomodoro demo supports the closed-loop timer path", async ({ page }) => {
-  await page.goto("/#/projects/focus-pomodoro/demo?testDuration=2");
+  await page.addInitScript(() => {
+    window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
+  });
+  await page.goto("/#/projects/focus-pomodoro/demo");
 
   await expect(page.getByRole("heading", { name: /Focus Pomodoro/i })).toBeVisible();
   await expect(page.getByText(/Solar Dial/i)).toBeVisible();
@@ -106,6 +110,10 @@ test("focus pomodoro demo supports the closed-loop timer path", async ({ page })
   await expect(page.getByRole("status")).toContainText("Focus session complete", {
     timeout: 4000
   });
+  await expect(page.getByTestId("pomodoro-completed-count")).toContainText("1");
+
+  await page.getByRole("button", { name: "Start" }).click();
+  await page.waitForTimeout(2200);
   await expect(page.getByTestId("pomodoro-completed-count")).toContainText("1");
 
   await page.reload();

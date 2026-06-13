@@ -188,7 +188,9 @@ export function mountPomodoroDemo(options: PomodoroDemoOptions = {}): () => void
 
       if (action === "start") {
         state = startTimer(state);
-        startInterval();
+        if (state.status === "running") {
+          startInterval();
+        }
       }
 
       if (action === "pause") {

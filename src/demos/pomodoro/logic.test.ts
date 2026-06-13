@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   completeSession,
   createPomodoroState,
@@ -20,6 +20,7 @@ const durations: PomodoroDurations = {
 describe("Pomodoro logic", () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.restoreAllMocks();
   });
 
   it("moves through start, pause, and reset without losing the selected mode", () => {
@@ -80,6 +81,37 @@ describe("Pomodoro logic", () => {
     expect(loadTodayRecord("2026-06-13")).toEqual({
       date: "2026-06-13",
       completed: 3
+    });
+  });
+
+  it("does not restart or count again when start is pressed after completion", () => {
+    const running = startTimer(createPomodoroState({ durations, today: "2026-06-13" }));
+    const complete = tickTimer(running, 10, { durations, today: "2026-06-13" });
+    const restarted = startTimer(complete);
+    const tickedAgain = tickTimer(restarted, 10, { durations, today: "2026-06-13" });
+
+    expect(restarted.status).toBe("complete");
+    expect(tickedAgain.completedToday).toBe(1);
+    expect(loadTodayRecord("2026-06-13")).toEqual({
+      date: "2026-06-13",
+      completed: 1
+    });
+  });
+
+  it("keeps completion feedback usable when localStorage writes fail", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("storage full");
+    });
+
+    const running = startTimer(createPomodoroState({ durations, today: "2026-06-13" }));
+
+    expect(() => completeSession(running, { durations, today: "2026-06-13" })).not.toThrow();
+
+    const complete = tickTimer(running, 10, { durations, today: "2026-06-13" });
+    expect(complete).toMatchObject({
+      status: "complete",
+      completedToday: 1,
+      message: "Focus session complete. Take a short break."
     });
   });
 

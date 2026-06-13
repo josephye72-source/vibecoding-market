@@ -26,7 +26,7 @@
 
 - `logic.ts`: state transitions, duration normalization, progress math, countdown formatting, storage fallback.
 - `render.ts`: HTML string, DOM query selectors, event listeners, interval lifecycle, visual updates.
-- `main.ts`: route selection, test-duration query parsing, demo cleanup when routes change.
+- `main.ts`: route selection, Pomodoro demo mounting, and demo cleanup when routes change.
 - `app.css`: layout, color, touch target, progress, focus-friendly control styling.
 - `site.spec.ts`: browser proof that the user can complete the timer loop.
 

@@ -17,16 +17,30 @@ if (!app) {
 const appRoot = app;
 let cleanupDemo: (() => void) | undefined;
 
-function getDemoDurations(hash: string): PomodoroDurations {
-  const [, query = ""] = hash.replace(/^#/, "").split("?");
-  const params = new URLSearchParams(query);
-  const testDuration = Number(params.get("testDuration"));
-
-  if (Number.isFinite(testDuration) && testDuration > 0) {
-    return {
-      focus: Math.floor(testDuration),
-      break: Math.max(1, Math.floor(testDuration))
+declare global {
+  interface ImportMeta {
+    readonly env: {
+      readonly DEV: boolean;
     };
+  }
+
+  interface Window {
+    __VCM_POMODORO_TEST_DURATIONS__?: Partial<PomodoroDurations>;
+  }
+}
+
+function getDemoDurations(): PomodoroDurations {
+  if (import.meta.env.DEV) {
+    const devDurations = window.__VCM_POMODORO_TEST_DURATIONS__;
+    const focus = Number(devDurations?.focus);
+    const shortBreak = Number(devDurations?.break);
+
+    if (Number.isFinite(focus) && focus > 0 && Number.isFinite(shortBreak) && shortBreak > 0) {
+      return {
+        focus: Math.floor(focus),
+        break: Math.floor(shortBreak)
+      };
+    }
   }
 
   return DEFAULT_POMODORO_DURATIONS;
@@ -73,7 +87,7 @@ function renderApp(): void {
   });
 
   if (route.path === "/projects/focus-pomodoro/demo") {
-    cleanupDemo = mountPomodoroDemo({ durations: getDemoDurations(window.location.hash) });
+    cleanupDemo = mountPomodoroDemo({ durations: getDemoDurations() });
   }
 
   if (route.anchor) {

@@ -72,8 +72,13 @@ export function loadTodayRecord(today = getTodayKey()): PomodoroRecord {
   }
 }
 
-export function saveTodayRecord(record: PomodoroRecord): void {
-  localStorage.setItem(POMODORO_RECORD_KEY, JSON.stringify(record));
+export function saveTodayRecord(record: PomodoroRecord): boolean {
+  try {
+    localStorage.setItem(POMODORO_RECORD_KEY, JSON.stringify(record));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function createPomodoroState(options: PomodoroOptions = {}): PomodoroState {
@@ -93,7 +98,7 @@ export function createPomodoroState(options: PomodoroOptions = {}): PomodoroStat
 }
 
 export function startTimer(state: PomodoroState): PomodoroState {
-  if (state.status === "running") {
+  if (state.status === "running" || state.status === "complete") {
     return state;
   }
 

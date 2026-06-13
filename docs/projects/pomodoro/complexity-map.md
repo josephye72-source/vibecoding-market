@@ -58,4 +58,4 @@ The visual complexity serves the timer. It does not add heavy 3D, WebGL, or asse
 
 ## Testing Complexity
 
-The production timer uses 25 minutes, which is too long for tests. The route supports a `testDuration` query for Playwright, while the pure logic accepts configurable durations for unit tests.
+The production timer uses 25 minutes, which is too long for direct waiting in automated tests. Keep duration overrides inside pure logic tests or test-only browser setup; the public route keeps the normal production durations.
