@@ -28,6 +28,16 @@ function linksFor(project: (typeof projects)[number]): ProjectLinks {
   return (project as { links?: ProjectLinks }).links ?? {};
 }
 
+function primaryRoutePaths(): string[] {
+  return [
+    "/",
+    ...projects.flatMap((project) => [
+      `/#/projects/${project.slug}`,
+      `/#/projects/${project.slug}/demo`
+    ])
+  ];
+}
+
 async function expectMinimumTouchTarget(locator: Locator): Promise<void> {
   const box = await locator.boundingBox();
 
@@ -207,15 +217,19 @@ async function exerciseDemoCoreControls(page: Page, slug: string): Promise<Locat
     return day;
   }
 
-  const total = page.getByLabel("Total");
-  const copy = page.getByRole("button", { name: /copy summary/i });
-  await total.fill("90");
-  await page.getByLabel("Participants").fill("Ava, Bo, Cy");
-  await expect(page.getByTestId("split-per-person")).toContainText("$30.00");
-  await expectMinimumTouchTarget(copy);
-  await copy.click();
-  await expect(page.getByRole("status")).toContainText(/copied/i);
-  return total;
+  if (slug === "split-console") {
+    const total = page.getByLabel("Total");
+    const copy = page.getByRole("button", { name: /copy summary/i });
+    await total.fill("90");
+    await page.getByLabel("Participants").fill("Ava, Bo, Cy");
+    await expect(page.getByTestId("split-per-person")).toContainText("$30.00");
+    await expectMinimumTouchTarget(copy);
+    await copy.click();
+    await expect(page.getByRole("status")).toContainText(/copied/i);
+    return total;
+  }
+
+  throw new Error(`Unsupported demo slug: ${slug}`);
 }
 
 test("homepage first viewport renders site value, primary paths, tags, and cards", async ({
@@ -623,13 +637,7 @@ test("keyboard Tab reaches homepage primary controls with visible focus", async 
 test("route smoke has no console errors across home, detail, and demo routes", async ({ page }) => {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
-  const routes = [
-    "/",
-    ...projects.flatMap((project) => [
-      `/#/projects/${project.slug}`,
-      `/#/projects/${project.slug}/demo`
-    ])
-  ];
+  const routes = primaryRoutePaths();
 
   page.on("console", (message) => {
     if (message.type() === "error") {
@@ -644,7 +652,6 @@ test("route smoke has no console errors across home, detail, and demo routes", a
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
 
     for (const route of routes) {
-      await prepareDemoRoute(page, route.split("/projects/")[1]?.split("/")[0] ?? "");
       await page.goto(route);
       await expect(page.locator("main")).toBeVisible();
     }
@@ -655,18 +662,11 @@ test("route smoke has no console errors across home, detail, and demo routes", a
 });
 
 test("main content has no horizontal overflow at 390px on primary routes", async ({ page }) => {
-  const routes = [
-    "/",
-    ...projects.flatMap((project) => [
-      `/#/projects/${project.slug}`,
-      `/#/projects/${project.slug}/demo`
-    ])
-  ];
+  const routes = primaryRoutePaths();
 
   await page.setViewportSize({ width: 390, height: 900 });
 
   for (const route of routes) {
-    await prepareDemoRoute(page, route.split("/projects/")[1]?.split("/")[0] ?? "");
     await page.goto(route);
     await expectNoMainHorizontalOverflow(page);
   }

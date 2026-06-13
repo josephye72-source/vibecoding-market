@@ -14,22 +14,22 @@ Guideline source: https://raw.githubusercontent.com/vercel-labs/web-interface-gu
 ## Checks Performed
 
 - Form controls have visible labels or `aria-label`.
-- Primary controls can be reached with keyboard Tab.
+- Sampled primary controls can be reached with keyboard Tab.
 - Focus is visible through the global `:focus-visible` outline and halo.
 - Async or changing status messages use `aria-live` or status/alert roles.
 - Actions use `button`; navigation uses links.
 - The app uses semantic `header`, `nav`, `main`, `section`, `article`, headings, and a skip link.
 - CSS avoids `transition: all` and honors `prefers-reduced-motion`.
 - No `user-scalable=no` or zoom-blocking viewport setting is present.
-- Core mobile controls meet the 44px touch target in the tested 390px viewport.
+- Sampled core mobile controls meet the 44px touch target in the tested 390px viewport.
 - Text and main content avoid horizontal overflow at 390px.
 - Console smoke found no console errors or page errors across primary routes.
 
 ## Findings
 
 - No blocking accessibility issues were found by the Task 7 Playwright coverage.
-- Keyboard focus reached the homepage primary CTA and each demo main control.
-- All core demo controls were visible and clickable at mobile and desktop sizes.
+- Keyboard focus reached the homepage primary CTA and sampled main controls for each demo.
+- Sampled core demo controls were visible and clickable at mobile and desktop sizes.
 - The tested form inputs in Tiny Ledger and Split Console were label-addressable.
 - Follow-up controller QA found a state clarity issue: Split Console's disabled `Copy summary` action was programmatically disabled, but visually looked like an enabled primary button.
 
