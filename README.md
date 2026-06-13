@@ -44,6 +44,6 @@ V1 is a static frontend with local browser state where a demo needs it. It does 
 
 ## Feedback
 
-Default feedback channel: GitHub Issue.
+Default feedback channel: GitHub Issue when the public repository is ready.
 
-If the public GitHub repository is not ready, use the social topic fallback in `docs/reviews/2026-06-13-v1-feedback-plan.md`. The feedback template asks for the most interesting project, reproduction willingness, stuck point, and remix idea.
+Current release fallback: the homepage opens a prefilled public `#VibeCodingMarketV1` social topic post. It asks for the most interesting project, reproduction willingness, stuck point, and remix idea. If a public GitHub Issue URL becomes available later, replace the social-topic link with that concrete issue URL and keep the same four-question template.

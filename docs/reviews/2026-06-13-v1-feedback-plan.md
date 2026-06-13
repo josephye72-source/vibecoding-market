@@ -5,13 +5,13 @@ Scope: V1 release feedback collection
 
 ## Default Channel
 
-Default feedback channel: GitHub Issue.
+Default feedback channel: GitHub Issue when the public repository is ready.
 
-Use one public issue template or pinned issue for V1 feedback. The issue should link back to the live V1 site and ask users to answer the four required feedback questions below.
+The public repository is not configured in this local release package, so the homepage uses the temporary public social topic fallback below. If a public repository issue tracker is ready later, replace the fallback link with one concrete GitHub Issue URL. Do not use a generic `https://github.com/` destination.
 
 ## Fallback Channel
 
-If the public GitHub repository or issue tracker is not ready at release time, use a public social topic as the temporary fallback channel.
+Use a public social topic as the temporary fallback channel until the concrete GitHub Issue URL exists.
 
 Suggested fallback topic:
 
@@ -37,7 +37,7 @@ Optional context fields:
 
 ## Collection Process
 
-1. Keep one GitHub Issue or one public social topic as the collection point for V1.
+1. Keep one concrete GitHub Issue or the homepage social topic fallback as the collection point for V1.
 2. Review feedback manually once or twice per week during the V1 feedback window.
 3. Copy useful notes into a simple review summary, grouped by project, reproduction signal, stuck point, and remix idea.
 4. Label items as V1 fix, documentation fix, unclear signal, or possible 2.0 idea.

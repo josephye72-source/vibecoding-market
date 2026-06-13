@@ -9,6 +9,15 @@ const pathSteps = [
 ];
 
 const positioningTags = ["公益", "开源", "无需登录", "无后端"];
+const feedbackTopic = "VibeCodingMarketV1";
+const feedbackPostText = `#${feedbackTopic}
+1. 最感兴趣项目：
+2. 是否愿意复现：
+3. 卡住位置：
+4. 二创想法：`;
+const feedbackHref = `https://x.com/intent/post?hashtags=${feedbackTopic}&text=${encodeURIComponent(
+  feedbackPostText
+)}`;
 
 export function renderHomePage(): string {
   const projectCards = projects.map((project) => renderProjectCard(project)).join("");
@@ -70,10 +79,10 @@ export function renderHomePage(): string {
     <section class="feedback" id="feedback" aria-labelledby="feedback-title">
       <div>
         <h2 id="feedback-title">反馈入口</h2>
-        <p>告诉我们你最想复现哪个项目、愿不愿意跟做、卡在哪里，以及想二创成什么版本。</p>
+        <p>用公开话题告诉我们四件事：最感兴趣项目、是否愿意复现、卡住位置、二创想法。</p>
       </div>
-      <a class="button button--secondary" href="https://github.com/" target="_blank" rel="noreferrer">
-        去 GitHub Issue 留反馈
+      <a class="button button--secondary" href="${feedbackHref}" target="_blank" rel="noreferrer">
+        发布话题反馈
       </a>
     </section>
   `;

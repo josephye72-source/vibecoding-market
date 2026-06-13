@@ -74,23 +74,27 @@ export function mountMemoryDemo(): () => void {
       return;
     }
 
-    grid.innerHTML = state.cards
-      .map(
-        (card) => `
-          <button
-            class="memory-card${card.isFaceUp ? " is-face-up" : ""}${card.isMatched ? " is-matched" : ""}"
-            type="button"
-            data-testid="memory-card"
-            data-memory-card="${card.id}"
-            aria-label="${card.isFaceUp || card.isMatched ? `Card ${card.symbol}` : "Hidden memory card"}"
-            aria-pressed="${card.isFaceUp || card.isMatched ? "true" : "false"}"
-            ${state.isLocked || card.isMatched ? "disabled" : ""}
-          >
-            <span>${card.isFaceUp || card.isMatched ? card.symbol : "?"}</span>
-          </button>
-        `
-      )
-      .join("");
+    const cardButtons = state.cards.map((card) => {
+      const isVisible = card.isFaceUp || card.isMatched;
+      const button = document.createElement("button");
+      const label = document.createElement("span");
+
+      button.className = `memory-card${card.isFaceUp ? " is-face-up" : ""}${
+        card.isMatched ? " is-matched" : ""
+      }`;
+      button.type = "button";
+      button.dataset.testid = "memory-card";
+      button.dataset.memoryCard = card.id;
+      button.setAttribute("aria-label", isVisible ? `Card ${card.symbol}` : "Hidden memory card");
+      button.setAttribute("aria-pressed", isVisible ? "true" : "false");
+      button.disabled = state.isLocked || card.isMatched;
+      label.textContent = isVisible ? card.symbol : "?";
+      button.append(label);
+
+      return button;
+    });
+
+    grid.replaceChildren(...cardButtons);
 
     if (moves) {
       moves.textContent = String(state.moves);

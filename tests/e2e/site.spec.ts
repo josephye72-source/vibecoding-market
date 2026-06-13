@@ -20,8 +20,9 @@ const homepageViewports: ViewportCheck[] = [
 ];
 
 const routeViewports: ViewportCheck[] = [
-  { label: "mobile", width: 390, height: 900 },
-  { label: "desktop", width: 1440, height: 1000 }
+  { label: "390px", width: 390, height: 900 },
+  { label: "768px", width: 768, height: 1000 },
+  { label: "1440px", width: 1440, height: 1000 }
 ];
 
 function linksFor(project: (typeof projects)[number]): ProjectLinks {
@@ -251,6 +252,24 @@ test("homepage renders a four-step beginner path", async ({ page }) => {
   await expect(page.getByTestId("beginner-path").locator("li")).toHaveCount(4);
 });
 
+test("homepage feedback entry uses a concrete channel and asks the four V1 questions", async ({
+  page
+}) => {
+  await page.goto("/");
+
+  const feedback = page.locator(".feedback");
+
+  await expect(feedback).toContainText("最感兴趣项目");
+  await expect(feedback).toContainText("是否愿意复现");
+  await expect(feedback).toContainText("卡住位置");
+  await expect(feedback).toContainText("二创想法");
+  await expect(feedback.getByRole("link", { name: /发布话题反馈/i })).toHaveAttribute(
+    "href",
+    /^https:\/\/x\.com\/intent\/post/
+  );
+  await expect(feedback.locator('a[href="https://github.com/"]')).toHaveCount(0);
+});
+
 for (const viewport of homepageViewports) {
   test(`homepage is visually available at ${viewport.label}`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -438,6 +457,18 @@ test("memory cards demo supports matching, mismatch feedback, victory, and resta
   await expect(page.getByRole("status")).toContainText(/all pairs/i);
   await page.getByRole("button", { name: /restart/i }).click();
   await expect(page.getByTestId("memory-moves")).toContainText("0");
+});
+
+test("memory cards demo safely renders symbol-like card text", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__VCM_MEMORY_TEST_ORDER__ = ["01", "10", "01", "</>", "10", "</>", "{}", "=>", "{}", "[]", "=>", "[]"];
+  });
+  await page.goto("/#/projects/memory-cards/demo");
+
+  const cards = page.getByTestId("memory-card");
+
+  await cards.nth(3).click();
+  await expect(cards.nth(3).locator("span")).toHaveText("</>");
 });
 
 test("tiny ledger demo adds, deletes, totals, persists, and shows empty state", async ({
