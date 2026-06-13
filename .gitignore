@@ -1,0 +1,27 @@
+# Runtime and local agent state
+.superpowers/brainstorm/
+.worktrees/
+worktrees/
+
+# Dependencies and build outputs
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+playwright-report/
+test-results/
+
+# Environment and local machine files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
