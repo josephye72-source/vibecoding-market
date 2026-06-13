@@ -1,61 +1,61 @@
-# Focus Pomodoro Remix Prompts
+# 专注番茄钟：二创任务
 
-## Light Remix
+## 轻改
 
-Prompt:
-
-```text
-Change the Focus Pomodoro into a 15-minute reading timer. Keep the same start, pause, reset, progress, completion feedback, and localStorage count.
-```
-
-Expected output:
-
-- Focus duration becomes 15 minutes.
-- Copy mentions reading.
-- The same tests still pass after duration expectations are updated.
-
-Validation:
-
-- Start works.
-- Completion increments today's count.
-- Refresh preserves the count.
-
-## Medium Remix
-
-Prompt:
+Prompt 1:
 
 ```text
-Add a task name field above the Pomodoro controls. The current task name should appear in the completion message, but the timer must still work if the field is empty.
+把专注番茄钟改成 15 分钟阅读计时器。保留 Start、Pause、Reset、进度反馈、完成反馈，以及今天完成次数写入 localStorage 的行为。
 ```
 
-Expected output:
+预期输出：
 
-- A labeled text input.
-- Completion message includes the task name when present.
-- Empty task name falls back to a generic message.
+- 专注时长变成 15 分钟。
+- 文案改成阅读场景。
+- 更新时长预期后，原有测试仍然可以通过。
 
-Validation:
+验收方式：
 
-- Input has a visible label.
-- Starting the timer does not require typing.
-- Completion feedback remains clear.
+- Start 可以开始计时。
+- 完成后会增加今天的完成次数。
+- 刷新后完成次数仍然保留。
 
-## Deep Remix
+## 中改
 
-Prompt:
+Prompt 2:
 
 ```text
-Turn the Pomodoro into a 7-day focus tracker. Store completed focus counts by date in localStorage and render a small weekly strip under the timer.
+在番茄钟控制区上方增加一个任务名称输入框。完成提示里要显示当前任务名；如果用户没有填写任务名，计时器也必须正常工作。
 ```
 
-Expected output:
+预期输出：
 
-- Data shape supports multiple dates.
-- Weekly strip shows 7 local days.
-- Today's completion updates the strip immediately.
+- 有一个带可见 label 的文本输入框。
+- 填写任务名时，完成文案包含任务名。
+- 任务名为空时，回退到通用完成提示。
 
-Validation:
+验收方式：
 
-- Completing a focus session changes today's count.
-- Refresh preserves the weekly strip.
-- Corrupt storage still falls back safely.
+- 输入框有清楚的标签。
+- 不输入任务名也能 Start。
+- 完成反馈仍然明确。
+
+## 深改
+
+Prompt 3:
+
+```text
+把番茄钟扩展成 7 天专注追踪器。用 localStorage 按日期保存每天完成的专注次数，并在计时器下方显示一个简单的 7 天条带。
+```
+
+预期输出：
+
+- 数据结构支持多个日期。
+- 7 天条带显示最近 7 个本地日期。
+- 今天完成后，条带立即更新。
+
+验收方式：
+
+- 完成一轮专注后，今天的次数变化。
+- 刷新后 7 天条带仍然保留。
+- 损坏的存储数据会安全回退。

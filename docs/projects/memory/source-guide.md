@@ -1,70 +1,68 @@
-# Memory Cards Source Guide
+# 记忆翻牌：源码导览
 
-## Read These Files First
+## 先看这些文件
 
 1. `src/demos/memory/logic.ts`
 
-   This file owns the game state, shuffle, flip rules, match detection, mismatch clearing, win condition, and restart.
+   先看这里。它保存游戏规则：创建卡牌、洗牌、翻牌、判断配对、处理不匹配、胜利条件和重新开始。
 
 2. `src/demos/memory/render.ts`
 
-   This file renders the board, connects card clicks, updates moves/status, and schedules the mismatch reset.
+   这个文件负责把卡牌棋盘画到页面上，连接每张卡的点击事件，更新步数、状态提示，并安排不匹配卡牌的延迟翻回。
 
 3. `src/main.ts`
 
-   This file mounts Memory Cards on `#/projects/memory-cards/demo` and cleans up timers when routes change.
+   这里把 Memory Cards 挂载到 `/#/projects/memory-cards/demo`，并在切换路由时清理等待中的计时器。
 
 4. `src/styles/app.css`
 
-   Search for `.memory-demo`. This section owns the Neon Arcade Lab motif.
+   搜索 `.memory-demo`。这一段控制 Neon Arcade Lab 的视觉，包括卡牌网格、发光、正反面状态和移动端布局。
 
 5. `src/demos/memory/logic.test.ts`
 
-   Read the tests before editing rules. They describe the expected behavior.
+   改规则前先读测试。它把“什么时候算一步”“什么时候锁住棋盘”“什么时候胜利”写得很清楚。
 
-## What Each Core File Does
+## 核心文件做什么
 
-- `logic.ts`: pure state transitions and shuffle.
-- `render.ts`: HTML, event listeners, and paint updates.
-- `main.ts`: route selection and demo mounting.
-- `app.css`: arcade card layout, glow, card states, and responsive grid.
-- `site.spec.ts`: browser proof that a player can complete the loop.
+- `logic.ts`：纯函数规则层，负责卡牌状态、洗牌、翻牌和胜利判断。
+- `render.ts`：负责 HTML、事件监听、界面刷新和延迟关闭不匹配卡牌。
+- `main.ts`：负责路由选择、demo 挂载和清理。
+- `app.css`：负责街机风卡牌网格、发光、匹配状态和响应式尺寸。
+- `site.spec.ts`：用浏览器测试证明玩家能完成一次主要游戏流程。
 
-## Beginner Edit Points
+## 新手可改位置
 
-1. Change card symbols:
+1. 想改卡牌符号：
 
-   Edit `DEFAULT_MEMORY_SYMBOLS` in `logic.ts`.
+   修改 `logic.ts` 里的 `DEFAULT_MEMORY_SYMBOLS`。
 
-2. Change mismatch timing:
+2. 想改不匹配卡牌停留多久：
 
-   Edit the `550` millisecond timeout in `render.ts`.
+   修改 `render.ts` 里的 `550` 毫秒延迟。
 
-3. Change visual glow:
+3. 想改霓虹发光效果：
 
-   Edit `.memory-shell`, `.memory-card`, and `.memory-card.is-face-up` in `app.css`.
+   修改 `app.css` 里的 `.memory-shell`、`.memory-card` 和 `.memory-card.is-face-up`。
 
-## Build Tool And Running
+改动时尽量保持分工：`logic.ts` 只管哪些牌打开或配对，`render.ts` 只管什么时候重画，CSS 只管每种卡牌状态看起来如何。
 
-This project uses Vite as a lightweight static frontend dev/build tool. For a beginner, Vite is the small helper that opens the app in a local browser, reloads when files change, and packages the plain web files for publishing.
+## 构建工具与运行
 
-Run locally:
+这个项目使用 Vite。它会帮你在本地启动网页、监听文件变化，并在发布前生成静态 `dist/`。
+
+本地运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open the local URL and visit `/#/projects/memory-cards/demo`.
+然后打开本地地址，进入 `/#/projects/memory-cards/demo`。
 
-Build/check before sharing:
+发布前检查：
 
 ```powershell
 npm run build
 ```
 
-That command type-checks the TypeScript and creates a static `dist/` build.
-
-## Safe Change Rule
-
-Logic decides which cards are open or matched. The renderer decides when to repaint. CSS decides how each card state feels.
+这个命令会检查 TypeScript，并生成可发布的静态构建。

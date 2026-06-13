@@ -1,215 +1,223 @@
-# Tiny Ledger: Codex From Zero
+# 账本小记：Codex 从 0 到 1
 
-## Project Goal
+## 项目目标
 
-Build a pure web ledger that adds income and expense records, stores amount/category/note/date, provides at least three categories, deletes records, shows income/expense/balance stats, persists in `localStorage`, and has a clear empty state.
+做一个纯 Web 本地账本：能添加收入和支出记录，保存金额、分类、备注和日期，至少有三个分类，可以删除记录，显示收入、支出、余额，数据持久化到 `localStorage`，并有清楚的空状态。
 
-## Preparation
+## 准备
 
-- Start from an empty folder.
-- Use plain HTML, CSS, and TypeScript or JavaScript.
-- Do not add a backend, login, database, API, payment, upload, leaderboard, or comments.
-- Keep record calculations in pure functions.
+- 从一个空文件夹开始。
+- 使用普通的 HTML、CSS 和 TypeScript，也可以先用 JavaScript。
+- 不要添加后端、登录、数据库、API、支付、上传、排行榜或评论。
+- 记录计算尽量写成纯函数。
 
-## From An Empty Folder
+## 从空文件夹开始
 
-Create these files first:
+先创建这些文件：
 
-- `index.html`: app root.
-- `src/main.ts`: imports the renderer and starts the app.
-- `src/demos/ledger/logic.ts`: record shape, add, delete, stats, storage.
-- `src/demos/ledger/render.ts`: form, list, empty state, and totals.
-- `src/styles/app.css`: Receipt Ledger visual motif.
+- `index.html`：页面入口和 app 挂载点。
+- `src/main.ts`：导入渲染器并启动应用。
+- `src/demos/ledger/logic.ts`：记录形状、添加、删除、统计和存储。
+- `src/demos/ledger/render.ts`：表单、列表、空状态和统计区域。
+- `src/styles/app.css`：Receipt Ledger 视觉。
 
-## Starting Prompt
+## 起步 Prompt
 
 Prompt:
 
 ```text
-Create a pure HTML/CSS/TypeScript local ledger from an empty folder. It must add income and expense records with amount, category, note, and date; include at least three categories; delete records; show income, expense, and balance; persist records in localStorage; and show a clear empty state with a primary action. Keep calculations in pure functions.
+从空文件夹创建一个纯 HTML/CSS/TypeScript 本地账本。它必须能添加收入和支出记录，记录包含金额、分类、备注和日期；至少提供三个分类；可以删除记录；显示收入、支出和余额；把记录保存到 localStorage；没有记录时显示清楚的空状态和主操作。计算逻辑请放在纯函数里。
 ```
 
-Expected output:
+预期输出：
 
-- A runnable static web app.
-- A labeled form.
-- A stats area.
-- A record list with delete buttons.
+- 一个能运行的静态 Web 应用。
+- 有带 label 的表单。
+- 有收入、支出、余额统计区。
+- 有记录列表和删除按钮。
 
-Validation:
+验收方式：
 
-- Add one income and one expense.
-- See at least two stats update immediately.
-- Delete a record and see stats update.
-- Refresh and confirm records remain.
+- 添加一条收入和一条支出。
+- 至少两个统计数字立即更新。
+- 删除一条记录后统计也更新。
+- 刷新后记录仍然存在。
 
-## Improvement Prompts
+## 改进 Prompt
 
 Prompt 1:
 
 ```text
-Add a Receipt Ledger motif with soft green paper, receipt-like rows, and clear positive/negative amount styling.
+加入 Receipt Ledger 视觉：柔和绿色纸面、类似收据的记录行，以及清楚的收入/支出金额样式。
 ```
 
-Expected output:
+预期输出：
 
-- Ledger paper look.
-- Income and expense are easy to distinguish.
+- 有账本纸面的感觉。
+- 收入和支出容易区分。
 
-Validation:
+验收方式：
 
-- Empty state, form, stats, and list fit on mobile.
-- Buttons remain at least 44px tall.
+- 空状态、表单、统计和列表在手机上能放下。
+- 按钮高度至少 44px。
 
 Prompt 2:
 
 ```text
-Add localStorage safety. If saved records are missing or corrupt, show an empty ledger instead of crashing.
+增加 localStorage 安全处理。如果保存的记录缺失或损坏，就显示空账本，不要让页面崩掉。
 ```
 
-Expected output:
+预期输出：
 
-- Safe parsing.
-- Empty fallback.
+- JSON 安全解析。
+- 失败时回退为空数组。
 
-Validation:
+验收方式：
 
-- Put invalid JSON in the storage key.
-- Reload the page.
-- The app opens with the empty state.
+- 往 storage key 放入无效 JSON。
+- 刷新页面。
+- 应用打开并显示空状态。
 
 Prompt 3:
 
 ```text
-After adding a record, reset the form while keeping the date set to today.
+添加记录后重置表单，但日期仍然保持为今天，方便继续输入下一条。
 ```
 
-Expected output:
+预期输出：
 
-- Amount and note clear.
-- Date remains usable.
+- 金额和备注会清空。
+- 日期仍然可用，默认适合继续录入。
 
-Validation:
+验收方式：
 
-- Add a record.
-- The next record can be entered immediately.
+- 添加一条记录。
+- 下一条记录可以马上输入。
 
-## Troubleshooting Prompts
+## 排错 Prompt
 
 Prompt 1:
 
 ```text
-The totals do not change after deleting a record. Recalculate stats from the new record array after every add or delete.
+删除记录后统计没有变化。请在每次添加或删除后，从新的 records 数组重新计算统计。
 ```
 
-Expected output:
+预期输出：
 
-- Delete updates list and totals.
+- 删除会同时更新列表和统计。
 
-Validation:
+验收方式：
 
-- Add income and expense.
-- Delete expense.
-- Balance equals income.
+- 添加一条收入和一条支出。
+- 删除支出。
+- 余额等于收入。
 
 Prompt 2:
 
 ```text
-Refresh removes every record. Check that add and delete both write the full records array to localStorage and initial state reads the same key.
+刷新后所有记录都没了。请检查添加和删除是否都把完整 records 数组写入 localStorage，并让初始状态读取同一个 key。
 ```
 
-Expected output:
+预期输出：
 
-- One shared storage key.
-- Initial render reads saved records.
+- 只有一个共享 storage key。
+- 初始渲染会读取已保存记录。
 
-Validation:
+验收方式：
 
-- Add a record.
-- Refresh.
-- The record remains.
+- 添加一条记录。
+- 刷新页面。
+- 记录仍然存在。
 
 Prompt 3:
 
 ```text
-Negative amounts break the balance. Validate the amount and ignore records that are not positive numbers.
+负数金额会把余额算乱。请校验金额，只允许正的有限数字创建记录。
 ```
 
-Expected output:
+预期输出：
 
-- Invalid amounts are not added.
-- Stats remain stable.
+- 无效金额不会加入 records。
+- 统计保持稳定。
 
-Validation:
+验收方式：
 
-- Try adding `-5`.
-- Record count does not change.
+- 尝试添加 `-5`。
+- 记录数量不变化。
 
-## Remix Prompts
+## 二创 Prompt
 
 Prompt 1:
 
 ```text
-Remix Tiny Ledger for travel spending by changing categories to Food, Transit, Hotel, and Tickets.
+把账本小记二创成旅行花销记录器，分类改成 Food、Transit、Hotel 和 Tickets。
 ```
 
-Expected output:
+预期输出：
 
-- New categories.
-- Same add/delete/stat behavior.
+- 出现新的旅行分类。
+- 添加、删除和统计行为不变。
 
-Validation:
+验收方式：
 
-- Each category can be selected.
+- 每个分类都能被选择。
 
 Prompt 2:
 
 ```text
-Add a category filter above the record list while keeping stats based on all records.
+在记录列表上方增加分类筛选器，但收入、支出和余额仍然基于全部记录计算。
 ```
 
-Expected output:
+预期输出：
 
-- Filtered visible list.
-- Totals still reflect all records.
+- 列表可以按分类过滤。
+- 总统计仍然反映全部记录。
 
-Validation:
+验收方式：
 
-- Add records in two categories.
-- Filter one category.
-- Stats remain unchanged.
+- 添加两个分类的记录。
+- 只筛选一个分类。
+- 统计不随筛选变少。
 
 Prompt 3:
 
 ```text
-Add monthly grouping by record date. Show each month with its own income, expense, and balance.
+按记录日期增加月度分组。每个月份显示自己的收入、支出和余额。
 ```
 
-Expected output:
+预期输出：
 
-- Records grouped by month.
-- Monthly subtotals.
+- 记录按月份分组。
+- 每组有月度小计。
 
-Validation:
+验收方式：
 
-- Add two dates in different months.
-- Two month sections appear.
+- 添加两个不同月份的日期。
+- 页面出现两个分组。
 
-## Running The Project
+## 运行项目
+
+在这个仓库里运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open `/#/projects/tiny-ledger/demo`.
+然后打开 `/#/projects/tiny-ledger/demo`。
 
-## Validation Checklist
+发布前可以检查一次构建：
 
-- Add income and expense records.
-- Each record has amount, category, note, and date.
-- At least three categories exist.
-- Delete works.
-- Income, expense, and balance update.
-- Records persist after refresh.
-- Empty state has helpful copy and a primary action.
+```powershell
+npm run build
+```
+
+## 验收清单
+
+- 可以添加收入和支出记录。
+- 每条记录有金额、分类、备注和日期。
+- 至少有三个分类。
+- 删除可用。
+- 收入、支出和余额会更新。
+- 记录刷新后仍然保留。
+- 空状态有清楚文案和主操作。

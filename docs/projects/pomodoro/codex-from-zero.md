@@ -1,228 +1,234 @@
-# Focus Pomodoro: Codex From Zero
+# 专注番茄钟：Codex 从 0 到 1
 
-## Project Goal
+## 项目目标
 
-Build a pure web Pomodoro timer that supports start, pause, reset, focus mode, break mode, countdown display, progress feedback, completion feedback, and today's completed focus count in `localStorage`.
+做一个纯 Web 番茄钟：支持专注模式、休息模式、Start、Pause、Reset、倒计时显示、进度反馈、完成反馈，并把今天完成的专注次数保存到 `localStorage`。
 
-## Preparation
+## 准备
 
-- Start from an empty folder.
-- Use plain HTML, CSS, and TypeScript or JavaScript.
-- Do not add a backend, login, database, or third-party API.
-- Keep the first version small enough to understand in one sitting.
+- 从一个空文件夹开始。
+- 使用普通的 HTML、CSS 和 TypeScript，也可以先用 JavaScript。
+- 不要添加后端、登录、数据库或第三方 API。
+- 第一版保持小而清楚，让新手能在一次阅读里看懂。
 
-## From An Empty Folder
+## 从空文件夹开始
 
-Create these files first:
+先创建这些文件：
 
-- `index.html`: page shell and timer controls.
-- `src/main.ts`: imports the renderer and starts the app.
-- `src/demos/pomodoro/logic.ts`: pure timer state and localStorage helpers.
-- `src/demos/pomodoro/render.ts`: DOM rendering and button wiring.
-- `src/styles/app.css`: Solar Dial visual motif and responsive layout.
+- `index.html`：页面外壳和计时器挂载点。
+- `src/main.ts`：导入渲染器并启动应用。
+- `src/demos/pomodoro/logic.ts`：纯计时状态和 `localStorage` 辅助函数。
+- `src/demos/pomodoro/render.ts`：DOM 渲染和按钮绑定。
+- `src/styles/app.css`：Solar Dial 视觉和响应式布局。
 
-## Starting Prompt
+## 起步 Prompt
 
 Prompt:
 
 ```text
-Create a pure HTML/CSS/TypeScript Pomodoro timer from an empty folder. It must have focus and break modes, Start, Pause, Reset buttons, a visible countdown, a progress indicator, completion feedback, and today's completed focus count saved in localStorage. Keep the timer logic in pure functions and keep the UI beginner-readable.
+从空文件夹创建一个纯 HTML/CSS/TypeScript 番茄钟。它必须有专注和休息两种模式，有 Start、Pause、Reset 按钮，有可见倒计时、进度提示、完成反馈，并把今天完成的专注次数保存到 localStorage。计时逻辑请放在纯函数里，界面对新手要容易读懂。
 ```
 
-Expected output:
+预期输出：
 
-- A runnable static web app.
-- A visible timer interface with the first action obvious.
-- Separate logic and rendering files.
-- No backend or API code.
+- 一个能运行的静态 Web 应用。
+- 页面上能直接看到计时器和第一步操作。
+- 逻辑文件和渲染文件分开。
+- 没有后端或 API 代码。
 
-Validation:
+验收方式：
 
-- Open the page and click Start within 15 seconds.
-- Pause and Reset change the visible state immediately.
-- A completed focus session increments today's count.
-- Refresh keeps today's count.
+- 打开页面后，15 秒内能找到并点击 Start。
+- Pause 和 Reset 会立刻改变可见状态。
+- 完成一轮专注后，今天完成次数加 1。
+- 刷新后今天完成次数仍然保留。
 
-## Improvement Prompts
+## 改进 Prompt
 
 Prompt 1:
 
 ```text
-Add a Solar Dial visual motif: a warm circular progress dial, amber panel, and clear focus/break mode controls. Keep all controls at least 44px tall and add visible focus states.
+加入 Solar Dial 视觉：暖色圆形进度盘、琥珀色面板，以及清楚的专注/休息模式按钮。所有按钮至少 44px 高，并提供可见的键盘焦点状态。
 ```
 
-Expected output:
+预期输出：
 
-- A circular progress indicator or strong progress bar.
-- Warm yellow and amber styling.
-- Keyboard focus is visible on every button.
+- 有圆形进度或很强的进度条。
+- 有暖黄色和琥珀色的番茄钟气质。
+- 每个按钮用键盘 Tab 到时都能看见焦点。
 
-Validation:
+验收方式：
 
-- Tab through Start, Pause, Reset, Focus, and Break.
-- The focused control is clearly visible.
-- Mobile width still shows the timer and controls.
+- 依次 Tab 到 Start、Pause、Reset、专注和休息按钮。
+- 当前焦点足够明显。
+- 手机宽度下仍然能看到计时器和控制按钮。
 
 Prompt 2:
 
 ```text
-Make the timer test-friendly by allowing configurable durations in the logic layer while keeping the production focus duration at 25 minutes and break duration at 5 minutes.
+让计时器更容易测试：逻辑层允许传入自定义时长，但正式界面仍然保持专注 25 分钟、休息 5 分钟。
 ```
 
-Expected output:
+预期输出：
 
-- Default durations for normal use.
-- Short durations can be passed by tests.
-- The UI still presents beginner-friendly Focus and Break modes.
+- 普通用户看到默认时长。
+- 测试可以传入很短的时长。
+- UI 仍然用新手能理解的专注和休息模式。
 
-Validation:
+验收方式：
 
-- A test can complete a focus session in 2 seconds.
-- Normal app load still shows 25:00 for focus mode.
+- 测试能用 2 秒完成一轮专注。
+- 正常打开应用时，专注模式仍显示 25:00。
 
 Prompt 3:
 
 ```text
-Add localStorage safety. If the saved Pomodoro record is missing, from another date, or corrupt JSON, fall back to today's count of 0 without crashing.
+增加 localStorage 安全处理。如果保存的番茄钟记录不存在、不是今天，或者是损坏的 JSON，就回退到今天完成 0 次，页面不能崩掉。
 ```
 
-Expected output:
+预期输出：
 
-- A storage key for today's Pomodoro record.
-- Safe parsing with fallback.
-- Refresh preservation for valid records.
+- 有一个保存今天记录的 storage key。
+- JSON 解析失败时安全回退。
+- 有效记录刷新后仍然保留。
 
-Validation:
+验收方式：
 
-- Manually put invalid JSON in localStorage.
-- Reload the page.
-- The app still opens and shows 0 completed today.
+- 手动往 localStorage 放入无效 JSON。
+- 刷新页面。
+- 页面仍然打开，并显示今天完成 0 次。
 
-## Troubleshooting Prompts
+## 排错 Prompt
 
 Prompt 1:
 
 ```text
-The countdown keeps running after I press Pause. Inspect interval creation and cleanup. Make Pause clear the active interval and make Start avoid creating duplicate intervals.
+按 Pause 后倒计时还在继续。请检查 interval 创建和清理逻辑，让 Pause 清掉当前 interval，并让 Start 避免创建重复 interval。
 ```
 
-Expected output:
+预期输出：
 
-- One active interval at most.
-- Pause freezes the countdown.
-- Start resumes from the paused time.
+- 同一时间最多只有一个 interval。
+- Pause 后倒计时停止。
+- 再次 Start 会从暂停时间继续。
 
-Validation:
+验收方式：
 
-- Start, wait one second, Pause.
-- The countdown does not change while paused.
+- Start 后等待一秒，再点击 Pause。
+- 暂停期间倒计时不再变化。
 
 Prompt 2:
 
 ```text
-The completed count resets after refresh. Inspect the localStorage key, record shape, and date check. Make the app read the saved record during initial state creation.
+完成次数刷新后归零。请检查 localStorage key、记录结构和日期判断，让应用在创建初始状态时读取已保存记录。
 ```
 
-Expected output:
+预期输出：
 
-- Initial state reads the saved count.
-- Completion writes `{ date, completed }`.
-- Date mismatch starts a new daily record.
+- 初始状态会读取保存的次数。
+- 完成时写入 `{ date, completed }`。
+- 日期不匹配时开启新的当天记录。
 
-Validation:
+验收方式：
 
-- Complete a short test session.
-- Refresh.
-- Today's count remains visible.
+- 完成一轮短测试计时。
+- 刷新页面。
+- 今天完成次数仍然可见。
 
 Prompt 3:
 
 ```text
-The progress indicator moves backward. Check whether progress means elapsed time or remaining time, then render elapsed / total as the visible progress.
+进度提示方向反了。请确认进度表示已经过去的时间，然后用 elapsed / total 渲染可见进度。
 ```
 
-Expected output:
+预期输出：
 
-- Progress starts at 0%.
-- Progress reaches 100% at completion.
-- Countdown still decreases.
+- 进度从 0% 开始。
+- 完成时到 100%。
+- 倒计时数字仍然递减。
 
-Validation:
+验收方式：
 
-- At the start, the bar or ring is empty.
-- Halfway through, it is about half full.
-- At completion, it is full.
+- 开始时进度为空。
+- 进行到一半时大约半满。
+- 完成时进度填满。
 
-## Remix Prompts
+## 二创 Prompt
 
 Prompt 1:
 
 ```text
-Remix this Pomodoro into a 15-minute writing sprint timer with copy that says Draft, Pause, Reset, and Done Drafting.
+把这个番茄钟二创成 15 分钟写作冲刺计时器，文案改成 Draft、Pause、Reset 和 Done Drafting，但保留同一套计时逻辑。
 ```
 
-Expected output:
+预期输出：
 
-- Same timer logic.
-- Writing-focused labels and completion message.
+- 计时逻辑不变。
+- 标签和完成提示变成写作场景。
 
-Validation:
+验收方式：
 
-- A writing sprint can start and complete.
-- The completed count still persists.
+- 写作冲刺可以开始并完成。
+- 完成次数仍然保存到 localStorage。
 
 Prompt 2:
 
 ```text
-Remix this into a study timer with three modes: Focus, Break, and Review. Add a mode switch and keep the state transitions testable.
+把它改成学习计时器，增加 Focus、Break、Review 三种模式。增加模式切换按钮，并让状态切换继续容易测试。
 ```
 
-Expected output:
+预期输出：
 
-- A third mode in the duration map.
-- Buttons update the selected mode.
-- Countdown and progress still work.
+- duration map 里有第三种模式。
+- 按钮可以切换当前模式。
+- 倒计时和进度仍然正常。
 
-Validation:
+验收方式：
 
-- Each mode resets to its own duration.
-- Start/Pause/Reset work in every mode.
+- 每种模式都会重置到自己的时长。
+- Start、Pause、Reset 在每种模式下都可用。
 
 Prompt 3:
 
 ```text
-Remix this into a weekly focus tracker by storing counts per date and showing a 7-day mini summary below the timer.
+把它扩展成每周专注追踪器：按日期保存完成次数，并在计时器下方显示 7 天迷你汇总。
 ```
 
-Expected output:
+预期输出：
 
-- A localStorage record keyed by date.
-- A simple weekly summary.
-- No backend or account system.
+- `localStorage` 记录按日期保存。
+- 页面有简单的每周汇总。
+- 不增加后端或账号系统。
 
-Validation:
+验收方式：
 
-- Completing today updates today's cell.
-- Refresh preserves the weekly summary.
+- 今天完成后，今天的格子更新。
+- 刷新后每周汇总仍然存在。
 
-## Running The Project
+## 运行项目
 
-Use your local dev server, then open the app route for the Pomodoro demo. In this repository, run:
+在这个仓库里运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open `/#/projects/focus-pomodoro/demo`.
+然后打开 `/#/projects/focus-pomodoro/demo`。
 
-## Validation Checklist
+发布前可以检查一次构建：
 
-- Start, Pause, and Reset are visible.
-- Focus and Break modes are visible.
-- Countdown text updates while running.
-- Progress feedback moves from 0% to 100%.
-- Completion feedback appears after a session.
-- Today's completed focus count is saved in `localStorage`.
-- Refresh preserves today's count.
-- The first action is understandable within 15 seconds.
+```powershell
+npm run build
+```
+
+## 验收清单
+
+- Start、Pause 和 Reset 可见。
+- 专注和休息模式可见。
+- 运行时倒计时文字会更新。
+- 进度反馈从 0% 走到 100%。
+- 一轮结束后出现完成反馈。
+- 今天完成次数保存到 `localStorage`。
+- 刷新后今天完成次数仍然存在。
+- 用户能在 15 秒内理解第一步操作。

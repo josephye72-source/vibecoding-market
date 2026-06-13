@@ -1,18 +1,8 @@
 import { projects, type Project } from "../data/projects";
-import { getProjectDocs } from "../data/projectDocs";
+import { getLocalizedProjectDocs } from "../data/projectDocs";
+import { dictionaries, getProjectText } from "../i18n/dictionaries";
+import type { Locale } from "../i18n/types";
 import { escapeHtml, renderProjectMeta, renderSkillTags } from "./ProjectMeta";
-
-const requiredSectionNames = [
-  "项目头部",
-  "在线体验",
-  "你会学到什么",
-  "复杂度从哪里来",
-  "源码导览",
-  "Codex 文档",
-  "Prompt 区",
-  "常见问题",
-  "二创任务"
-];
 
 function renderList(items: string[]): string {
   return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
@@ -27,8 +17,8 @@ function renderSection(title: string, body: string, sectionId: string, extraClas
   `;
 }
 
-function renderProjectDocLinks(project: Project): string {
-  const docs = getProjectDocs(project.slug);
+function renderProjectDocLinks(project: Project, locale: Locale): string {
+  const docs = getLocalizedProjectDocs(project.slug, locale);
 
   return `
     <ul class="doc-link-list">
@@ -37,17 +27,21 @@ function renderProjectDocLinks(project: Project): string {
   `;
 }
 
-function renderOnlineDemoBody(project: Project): string {
+function renderOnlineDemoBody(project: Project, locale: Locale): string {
+  const copy = dictionaries[locale].projectDetail;
+
   return `
-    <p>The ${escapeHtml(project.title)} demo is live. Open it to try the core loop directly in the browser with no backend, login, database, or API.</p>
-    <a class="button button--primary" href="${escapeHtml(project.links.demo)}">Open Live Demo</a>
+    <p>${copy.onlineDemoBody}</p>
+    <a class="button button--primary" href="${escapeHtml(project.links.demo)}">${copy.openDemo}</a>
   `;
 }
 
-function renderCodexDocBody(project: Project): string {
+function renderCodexDocBody(project: Project, locale: Locale): string {
+  const copy = dictionaries[locale].projectDetail;
+
   return `
-    <p>Use these docs to rebuild, inspect, troubleshoot, and remix ${escapeHtml(project.title)} from a blank folder.</p>
-    ${renderProjectDocLinks(project)}
+    <p>${copy.codexDocBody}</p>
+    ${renderProjectDocLinks(project, locale)}
   `;
 }
 
@@ -55,70 +49,75 @@ export function findProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
 
-export function renderProjectDetail(project: Project): string {
+export function renderProjectDetail(project: Project, locale: Locale): string {
+  const copy = dictionaries[locale].projectDetail;
+  const sectionNames = copy.sections;
+  const text = getProjectText(project, locale);
+
   return `
     <article class="project-detail project-detail--${project.motifKey}" data-motif="${project.motifKey}">
       ${renderSection(
-        requiredSectionNames[0],
+        sectionNames[0],
         `
-          <p class="project-detail__motif">${escapeHtml(project.visualMotif)}</p>
-          <h1>${escapeHtml(project.title)}</h1>
-          <p class="project-detail__lede">${escapeHtml(project.effect)}</p>
-          <p>${escapeHtml(project.audience)}</p>
-          ${renderProjectMeta(project)}
-          <div class="skill-tags">${renderSkillTags(project.skills)}</div>
+          <p class="project-detail__motif">${escapeHtml(text.visualMotif)}</p>
+          <h1>${escapeHtml(text.title)}</h1>
+          <p class="project-detail__lede">${escapeHtml(text.effect)}</p>
+          <p>${escapeHtml(text.audience)}</p>
+          ${renderProjectMeta(project, locale)}
+          <div class="skill-tags">${renderSkillTags(text.skills)}</div>
           <div class="detail-actions">
-            <a class="button button--primary" href="${escapeHtml(project.links.demo)}">在线体验</a>
-            <a class="button button--secondary" href="${escapeHtml(project.links.source)}">查看源代码</a>
-            <a class="button button--secondary" href="${escapeHtml(project.links.docs)}">跟着 Codex 做</a>
+            <a class="button button--primary" href="${escapeHtml(project.links.demo)}">${copy.openDemo}</a>
+            <a class="button button--secondary" href="${escapeHtml(project.links.source)}">${copy.viewSource}</a>
+            <a class="button button--secondary" href="${escapeHtml(project.links.docs)}">${copy.followCodex}</a>
+            <a class="button button--secondary" href="#feedback">${copy.feedback}</a>
           </div>
         `,
         "detail-header",
         "detail-section--hero"
       )}
       ${renderSection(
-        requiredSectionNames[1],
-        renderOnlineDemoBody(project),
+        sectionNames[1],
+        renderOnlineDemoBody(project, locale),
         "online-demo"
       )}
-      ${renderSection(requiredSectionNames[2], renderList(project.learningGoals), "learning-goals")}
-      ${renderSection(requiredSectionNames[3], renderList(project.complexitySources), "complexity-sources")}
+      ${renderSection(sectionNames[2], renderList(text.learningGoals), "learning-goals")}
+      ${renderSection(sectionNames[3], renderList(text.complexitySources), "complexity-sources")}
       ${renderSection(
-        requiredSectionNames[4],
-        `<div>${renderList(project.sourceGuide)}</div>`,
+        sectionNames[4],
+        `<div>${renderList(text.sourceGuide)}</div>`,
         "source-guide"
       )}
       ${renderSection(
-        requiredSectionNames[5],
-        renderCodexDocBody(project),
+        sectionNames[5],
+        renderCodexDocBody(project, locale),
         "codex-doc"
       )}
       ${renderSection(
-        requiredSectionNames[6],
+        sectionNames[6],
         `
           <div class="prompt-grid">
             <article>
-              <h3>起步 Prompt</h3>
-              <p>${escapeHtml(project.promptSet.start)}</p>
+              <h3>${copy.promptStart}</h3>
+              <p>${escapeHtml(text.promptSet.start)}</p>
             </article>
             <article>
-              <h3>修改 Prompt</h3>
-              <p>${escapeHtml(project.promptSet.improve)}</p>
+              <h3>${copy.promptImprove}</h3>
+              <p>${escapeHtml(text.promptSet.improve)}</p>
             </article>
             <article>
-              <h3>排错 Prompt</h3>
-              <p>${escapeHtml(project.promptSet.debug)}</p>
+              <h3>${copy.promptDebug}</h3>
+              <p>${escapeHtml(text.promptSet.debug)}</p>
             </article>
           </div>
         `,
         "prompt-zone"
       )}
-      ${renderSection(requiredSectionNames[7], renderList(project.faq), "faq")}
+      ${renderSection(sectionNames[7], renderList(text.faq), "faq")}
       ${renderSection(
-        requiredSectionNames[8],
+        sectionNames[8],
         `
           <div class="remix-grid">
-            ${project.remixTasks
+            ${text.remixTasks
               .map(
                 (task) => `
                   <article>
@@ -137,11 +136,13 @@ export function renderProjectDetail(project: Project): string {
   `;
 }
 
-export function renderDemoPending(project: Project): string {
+export function renderDemoPending(project: Project, locale: Locale): string {
+  const text = getProjectText(project, locale);
+
   return `
     <section class="demo-pending demo-pending--${project.motifKey}" data-motif="${project.motifKey}" aria-labelledby="demo-title">
-      <p class="project-detail__motif">${escapeHtml(project.visualMotif)}</p>
-      <h1 id="demo-title">${escapeHtml(project.title)} Demo</h1>
+      <p class="project-detail__motif">${escapeHtml(text.visualMotif)}</p>
+      <h1 id="demo-title">${escapeHtml(text.title)} Demo</h1>
       <p class="project-detail__lede">在线体验实现中</p>
       <p>
         Task 3 只交付首页、详情模板和 demo 路由占位。完整 demo 逻辑会在后续任务中补齐。
@@ -154,12 +155,14 @@ export function renderDemoPending(project: Project): string {
   `;
 }
 
-export function renderNotFound(): string {
+export function renderNotFound(locale: Locale = "zh"): string {
+  const copy = dictionaries[locale].projectDetail;
+
   return `
     <section class="not-found" data-testid="not-found" aria-labelledby="not-found-title">
-      <h1 id="not-found-title">没有找到这个项目</h1>
-      <p>回到首页，从 5 个首发项目里重新选择。</p>
-      <a class="button button--primary" href="#/">回到首页</a>
+      <h1 id="not-found-title">${copy.notFoundTitle}</h1>
+      <p>${copy.notFoundBody}</p>
+      <a class="button button--primary" href="#/">${dictionaries[locale].shell.nav.home}</a>
     </section>
   `;
 }

@@ -1,29 +1,29 @@
-# Memory Cards FAQ
+# 记忆翻牌：常见问题
 
-## 1. Why can I click the same card twice?
+## 1. 为什么同一张卡点两次也算配对？
 
-Ignore clicks on cards that are already face-up or already matched.
+点击处理里要忽略已经翻开或已经配对的卡。只有两张不同的卡被翻开后，才进入一次配对判断。
 
-## 2. Why do mismatched cards stay open forever?
+## 2. 为什么不匹配的两张卡一直不翻回去？
 
-After a mismatch, schedule a short timeout that calls the function that clears unmatched face-up cards.
+不匹配后安排一个短暂的 timeout，时间到了再调用清理未匹配翻开卡的函数。
 
-## 3. Why can I flip a third card during mismatch feedback?
+## 3. 为什么不匹配反馈时还能翻第三张卡？
 
-Use a locked state while the mismatch is visible. The renderer can disable cards until the timeout clears.
+显示不匹配反馈时使用 locked 状态。渲染层可以暂时禁用其他卡牌，等 timeout 结束后再恢复。
 
-## 4. Why is the order the same after restart?
+## 4. 为什么重新开始后的顺序总一样？
 
-Make restart create a new shuffled card array. Do not reuse the previous card order.
+Restart 应该创建一份新的洗牌卡牌数组，不要复用上一局的数组顺序。
 
-## 5. Why does the move count increase too often?
+## 5. 为什么步数增加得太快？
 
-Only increase moves after the second card in a pair attempt is flipped.
+只在第二张卡翻开、一次尝试成立时增加 moves。第一张卡翻开时不要加步数。
 
-## 6. Why does victory appear before the final pair?
+## 6. 为什么还没配完就显示胜利？
 
-Only set victory when every card has `isMatched: true`.
+胜利条件必须检查每张卡都是 `isMatched: true`。只配到一两组时只能显示普通匹配反馈。
 
-## 7. Why are cards hard to tap on mobile?
+## 7. 为什么手机上卡牌不好点？
 
-Keep card buttons large enough, use a responsive grid, and avoid tiny text-only click targets.
+卡牌按钮要足够大，网格要响应式缩放，不要把点击目标做成很小的文字。

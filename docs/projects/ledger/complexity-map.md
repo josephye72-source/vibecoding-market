@@ -1,41 +1,47 @@
-# Tiny Ledger Complexity Map
+# 账本小记：复杂度拆解
 
-## Page Structure
+## 页面结构
 
-The demo has four zones:
+demo 有四块区域：
 
-- Intro: what the ledger does.
-- Form: type, amount, category, note, date.
-- Stats: income, expense, balance.
-- Records: empty state or record rows.
+- 介绍区：说明这个小账本能做什么。
+- 表单区：输入类型、金额、分类、备注和日期。
+- 统计区：显示收入、支出和余额。
+- 记录区：没有记录时显示空状态，有记录时显示列表。
 
-## Interaction
+页面的关键是让“添加第一条记录”足够明显。
 
-The user can:
+## 交互
 
-- Add an income record.
-- Add an expense record.
-- Delete a record.
-- Refresh and see records persist.
+用户可以：
 
-## State
+- 添加一条收入记录。
+- 添加一条支出记录。
+- 删除一条记录。
+- 刷新页面后继续看到保存过的记录。
 
-The main state is one record array. Each record has id, type, amount, category, note, and date.
+每次添加或删除后，都要重新渲染列表和统计，不能只改其中一个。
 
-## Data
+## 状态
 
-Records are saved to one localStorage key. Invalid or corrupt storage falls back to an empty array. No backend, database, payment, account, or API exists.
+主要状态是一组记录数组。每条记录包含 id、type、amount、category、note 和 date。
 
-## Visual Completion
+收入、支出和余额是从记录数组计算出来的派生数据，不应该再单独保存一份。
 
-Receipt Ledger uses:
+## 数据
 
-- green paper surface.
-- receipt-like rows.
-- compact stats.
-- clear empty state.
-- positive and negative amount cues.
+记录保存到一个 `localStorage` key。读取失败、数据缺失或 JSON 损坏时，回退为空数组。
 
-## Testing Complexity
+这里不需要后端、数据库、支付、账号或 API。
 
-Stats are derived data. Tests add and delete records, then recalculate income, expense, and balance from the record array.
+## 视觉完成度
+
+Receipt Ledger 的完成感来自这些元素：
+
+- 柔和的绿色纸面。
+- 像收据一样的一行行记录。
+- 紧凑的收入/支出/余额统计。
+- 清楚的空状态。
+- 正负金额的视觉区分。
+
+视觉重点是让用户一眼看懂“钱进来、钱出去、现在余额是多少”。

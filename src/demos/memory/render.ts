@@ -6,6 +6,8 @@ import {
   type MemoryFeedback,
   type MemoryState
 } from "./logic";
+import { dictionaries } from "../../i18n/dictionaries";
+import type { Locale } from "../../i18n/types";
 
 declare global {
   interface Window {
@@ -13,38 +15,32 @@ declare global {
   }
 }
 
-const feedbackCopy: Record<MemoryFeedback, string> = {
-  ready: "Flip two cards to find a pair.",
-  first: "Pick one more card.",
-  match: "Match found.",
-  mismatch: "Not a match. Try again.",
-  win: "All pairs matched. You cleared the lab."
-};
+export function renderMemoryDemo(locale: Locale): string {
+  const copy = dictionaries[locale].demos.memory;
 
-export function renderMemoryDemo(): string {
   return `
     <section class="memory-demo" data-testid="memory-demo" aria-labelledby="memory-title">
       <div class="demo-intro">
-        <p class="project-detail__motif">Neon Arcade Lab / Memory Cards</p>
-        <h1 id="memory-title">Memory Cards</h1>
-        <p class="project-detail__lede">Flip cards, catch pairs, and restart with a fresh shuffled board.</p>
+        <p class="project-detail__motif">${copy.title === "Memory Cards" ? "Neon Arcade Lab / Memory Cards" : "Neon Arcade Lab / 霓虹实验台"}</p>
+        <h1 id="memory-title">${copy.title}</h1>
+        <p class="project-detail__lede">${copy.lede}</p>
       </div>
       <div class="memory-shell">
         <div class="memory-hud">
           <div>
-            <span>Moves</span>
+            <span>${copy.moves}</span>
             <strong data-testid="memory-moves">0</strong>
           </div>
-          <p role="status" aria-live="polite" data-memory-feedback>${feedbackCopy.ready}</p>
-          <button class="button button--primary" type="button" data-memory-restart>Restart game</button>
+          <p role="status" aria-live="polite" data-memory-feedback>${copy.feedback.ready}</p>
+          <button class="button button--primary" type="button" data-memory-restart>${copy.restart}</button>
         </div>
-        <div class="memory-grid" data-memory-grid aria-label="Memory card grid"></div>
+        <div class="memory-grid" data-memory-grid aria-label="${copy.gridLabel}"></div>
       </div>
     </section>
   `;
 }
 
-export function mountMemoryDemo(): () => void {
+export function mountMemoryDemo(locale: Locale): () => void {
   const root = document.querySelector<HTMLElement>("[data-testid='memory-demo']");
 
   if (!root) {
@@ -55,6 +51,7 @@ export function mountMemoryDemo(): () => void {
   const moves = root.querySelector<HTMLElement>("[data-testid='memory-moves']");
   const feedback = root.querySelector<HTMLElement>("[data-memory-feedback]");
   const restart = root.querySelector<HTMLButtonElement>("[data-memory-restart]");
+  const copy = dictionaries[locale].demos.memory;
   const testOrder =
     import.meta.env.DEV && Array.isArray(window.__VCM_MEMORY_TEST_ORDER__)
       ? window.__VCM_MEMORY_TEST_ORDER__
@@ -85,7 +82,7 @@ export function mountMemoryDemo(): () => void {
       button.type = "button";
       button.dataset.testid = "memory-card";
       button.dataset.memoryCard = card.id;
-      button.setAttribute("aria-label", isVisible ? `Card ${card.symbol}` : "Hidden memory card");
+      button.setAttribute("aria-label", isVisible ? `${copy.cardLabel} ${card.symbol}` : copy.hiddenCard);
       button.setAttribute("aria-pressed", isVisible ? "true" : "false");
       button.disabled = state.isLocked || card.isMatched;
       label.textContent = isVisible ? card.symbol : "?";
@@ -101,7 +98,7 @@ export function mountMemoryDemo(): () => void {
     }
 
     if (feedback) {
-      feedback.textContent = feedbackCopy[state.feedback];
+      feedback.textContent = copy.feedback[state.feedback];
     }
   }
 

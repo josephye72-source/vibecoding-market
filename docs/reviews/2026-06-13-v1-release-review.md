@@ -1,9 +1,12 @@
 # Vibe Coding Market V1 Release Review
 
 > 状态更新，2026-06-13：这份 review 现在只作为历史技术证据保留。
-> 最终公开发布验收结论以
+> 原始 Gate 6 验收结论以
 > `docs/reviews/acceptance/2026-06-13-v1-gate6-release-acceptance-report.md`
-> 为准。当前验收结论：不建议公开发布，需先修复长期定位、整站信息架构、源码入口、反馈入口、语言与 i18n 阻塞项。
+> 为准：不建议公开发布，需先修复长期定位、整站信息架构、源码入口、反馈入口、语言与 i18n 阻塞项。
+> remediation 后的最新复验结论以
+> `docs/reviews/acceptance/2026-06-13-v1-gate6-release-remediation-rereview-acceptance-report.md`
+> 和 `docs/reviews/2026-06-13-v1-gate6-remediation-release-review.md` 为准：Gate 6 remediation 复验通过，反馈渠道保持 pending。
 
 Date: 2026-06-13
 Product baseline commit: `bf89dd0beb2953b765c2ff41395ecc6f24c9918e`
@@ -14,9 +17,9 @@ Package task: Task 8 plus final release review gap fixes
 
 ## Release Recommendation
 
-Recommendation: Pass for the final handoff HEAD confirmed by `git rev-parse HEAD`, covering the pre-final-gap implementation head plus the feedback-entry, Memory Cards rendering, viewport-matrix, and `zh-CN` evidence fixes in this commit.
+Historical recommendation at the time: Pass for the final handoff HEAD confirmed by `git rev-parse HEAD`, covering the pre-final-gap implementation head plus the feedback-entry, Memory Cards rendering, viewport-matrix, and `zh-CN` evidence fixes in this commit.
 
-V1 is ready for a public release review and lightweight feedback collection. The recommendation is based on the checked V1 scope, the five-project static site boundary, Task 7 visual and accessibility QA, unit coverage, Playwright route and interaction coverage, and the absence of blocking release risks in this review package.
+This historical recommendation was superseded by the Gate 6 acceptance report and then by the Gate 6 remediation rereview. The current feedback entry is pending and must not be treated as an enabled public feedback collection channel.
 
 This recommendation does not approve any 2.0 work. Per the baseline spec, post-release feedback must prove beginner reproduction signal before 2.0 starts.
 
@@ -51,7 +54,7 @@ Primary scope evidence:
 | Phase 3, first project closed loop | Focus Pomodoro demo, detail page, source guide, Codex doc, FAQ, remix tasks, local record, no backend or API. | `src/demos/pomodoro/logic.ts`, `src/demos/pomodoro/render.ts`, `docs/projects/pomodoro/*`, `src/data/projects.ts` | `src/demos/pomodoro/logic.test.ts`; `tests/e2e/site.spec.ts` test `focus pomodoro demo supports the closed-loop timer path` | Task 7 sampled Focus Pomodoro on mobile and desktop detail and demo routes. | `docs/projects/pomodoro/codex-from-zero.md`; `docs/projects/pomodoro/source-guide.md` | Pass |
 | Phase 4, template solidification | Project detail template has 9 fixed sections; Codex docs and source docs use the same required registry and link rules; metadata template includes slug, order, roles, links, motif, skills, and docs folder. | `src/components/ProjectDetail.ts`, `src/data/projects.ts`, `src/data/projectDocs.ts`, `docs/projects/*/*` | `src/data/projectDocs.test.ts` tests `defines exactly five canonical doc links for every project`, `maps every canonical doc link to the static published href and existing repo file`, `keeps each project metadata record complete for V1`, `renders detail page links from project metadata and the centralized doc registry` | Shared detail route structure was checked at 390px and 1440px in Task 7. | Baseline spec section 5.4; `docs/reviews/2026-06-13-v1-visual-qa.md` | Pass |
 | Phase 5, remaining four projects | Memory Cards, Tiny Ledger, Habit Grid, and Split Console each have a demo, detail page, source entry, source guide, Codex doc, FAQ, remix prompts, motif, states, and local or page state feedback where required. | `src/demos/memory/*`, `src/demos/ledger/*`, `src/demos/habits/*`, `src/demos/split/*`, `docs/projects/memory/*`, `docs/projects/ledger/*`, `docs/projects/habits/*`, `docs/projects/split/*` | Unit tests under `src/demos/*/logic.test.ts`; Playwright tests `memory cards demo supports matching, mismatch feedback, victory, and restart`, `memory cards demo safely renders symbol-like card text`, `tiny ledger demo adds, deletes, totals, persists, and shows empty state`, `habit grid demo toggles a date, shows stats, and persists after refresh`, `split console demo calculates immediately, blocks invalid input, and copies summary` | Task 7 visual QA inspected all detail and demo routes; final release gap matrix covers 390px, 768px, and 1440px. | Baseline spec sections 5.5 and 8.2-8.5 | Pass |
-| Phase 6, site integration and pre-release acceptance | Complete homepage, 5 details, 5 demos, 5 source entries, 5 Codex docs, feedback entry, pre-release review, risk list, link integrity, responsive QA, console smoke, 5-minute manual QA note. | `src/components/HomePage.ts`, `src/components/AppShell.ts`, `src/components/ProjectDetail.ts`, `src/data/projectDocs.ts`, this file, `docs/reviews/2026-06-13-v1-feedback-plan.md` | `tests/e2e/site.spec.ts` tests `homepage feedback entry uses a concrete channel and asks the four V1 questions`, `project documentation links resolve from the static app`, `route smoke has no console errors across home, detail, and demo routes`, `main content has no horizontal overflow at 390px on primary routes`; `npm run build`; `npm run test:e2e` | Feedback uses the public `#VibeCodingMarketV1` social-topic fallback with four prompted feedback fields until a concrete GitHub Issue URL exists. Controller timed exploratory smoke on 2026-06-13 covered 303 seconds against `http://127.0.0.1:5173` with no console errors, page errors, or blocking interaction errors. | `docs/reviews/2026-06-13-v1-visual-qa.md`; `docs/reviews/2026-06-13-v1-accessibility-review.md`; `docs/reviews/2026-06-13-v1-feedback-plan.md` | Pass |
+| Phase 6, site integration and pre-release acceptance | Complete homepage, 5 details, 5 demos, 5 source entries, 5 Codex docs, feedback entry, pre-release review, risk list, link integrity, responsive QA, console smoke, 5-minute manual QA note. | `src/components/HomePage.ts`, `src/components/AppShell.ts`, `src/components/ProjectDetail.ts`, `src/data/projectDocs.ts`, this file, `docs/reviews/2026-06-13-v1-feedback-plan.md` | Historical tests and review evidence from the pre-remediation package. | Historical note: this row originally described a temporary public fallback channel. Gate 6 remediation superseded that behavior; the current feedback entry is pending and disabled. | `docs/reviews/2026-06-13-v1-visual-qa.md`; `docs/reviews/2026-06-13-v1-accessibility-review.md`; `docs/reviews/2026-06-13-v1-feedback-plan.md` | Historical |
 
 ## Core Deliverables Checklist
 
@@ -62,7 +65,7 @@ Primary scope evidence:
 | 5 demos | `src/demos/pomodoro`, `src/demos/memory`, `src/demos/ledger`, `src/demos/habits`, `src/demos/split`; Playwright project-specific demo tests | Pass |
 | 5 source entries | `src/data/projects.ts` `links.source`; `docs/projects/*/source-guide.md`; `src/data/projectDocs.test.ts` source-guide assertions | Pass |
 | 5 Codex docs | `docs/projects/*/codex-from-zero.md`; `src/data/projectDocs.test.ts` test `keeps every Codex-from-zero guide complete enough to reproduce` | Pass |
-| Feedback entry | `src/components/HomePage.ts` feedback section with public `#VibeCodingMarketV1` social-topic fallback; Playwright test `homepage feedback entry uses a concrete channel and asks the four V1 questions`; `src/components/AppShell.ts` feedback nav; `docs/reviews/2026-06-13-v1-feedback-plan.md` | Pass |
+| Feedback entry | Historical feedback section evidence. Superseded by Gate 6 remediation: current homepage keeps a disabled pending feedback entry and does not bind to an external channel. | Historical |
 | Release risk list | Pre-release risk list in this file | Pass |
 
 ## Project Definition Of Done
@@ -123,7 +126,7 @@ Controller timed smoke on 2026-06-13:
 | --- | --- | --- | --- | --- |
 | Browser plugin screenshot capture was unavailable during Task 7. | Low | `docs/reviews/2026-06-13-v1-visual-qa.md` accepted deviation; Playwright screenshots and route checks replaced it. | Release owner can rerun Browser plugin QA if the attach timeout is resolved. | No |
 | Accessibility review is not a full assistive-technology audit. | Low | `docs/reviews/2026-06-13-v1-accessibility-review.md` remaining accepted risks. | Release owner can schedule axe/Lighthouse or screen-reader pass after V1 if feedback indicates accessibility friction. | No |
-| Public fallback topic should be replaced by GitHub Issue when the repository is ready. | Low | `src/components/HomePage.ts` uses concrete `#VibeCodingMarketV1` social-topic fallback; `docs/reviews/2026-06-13-v1-feedback-plan.md` documents GitHub Issue as default and social topic as the temporary fallback. | Release owner should replace the fallback with a concrete public GitHub Issue URL before broad announcement if the repository is ready. | No |
+| Feedback channel remained undecided. | Low | Historical package used a temporary public fallback. Gate 6 remediation replaced it with a disabled pending feedback entry. | Product owner should choose one concrete channel before enabling feedback collection. | No |
 | Public feedback volume may be too small to justify 2.0. | Medium | Baseline spec section 7 and 12 require post-release feedback signal before 2.0. | Release owner must apply the feedback plan decision rule and keep 2.0 blocked until reproduction evidence exists. | No |
 
 ## Verification Commands

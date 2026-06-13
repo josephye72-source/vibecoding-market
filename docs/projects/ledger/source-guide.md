@@ -1,70 +1,68 @@
-# Tiny Ledger Source Guide
+# 账本小记：源码导览
 
-## Read These Files First
+## 先看这些文件
 
 1. `src/demos/ledger/logic.ts`
 
-   This file defines the record shape, categories, add/delete behavior, totals, and localStorage handling.
+   先读这里。它定义账本记录的字段、分类、添加/删除规则、统计计算，以及 `localStorage` 读写。
 
 2. `src/demos/ledger/render.ts`
 
-   This file renders the form, stats, empty state, and record list.
+   这个文件负责表单、统计区域、空状态和记录列表的渲染，也会读取用户输入并调用逻辑层。
 
 3. `src/main.ts`
 
-   This file mounts Tiny Ledger on `#/projects/tiny-ledger/demo`.
+   这里把 Tiny Ledger 挂载到 `/#/projects/tiny-ledger/demo`。
 
 4. `src/styles/app.css`
 
-   Search for `.ledger-demo`. This section owns the Receipt Ledger motif.
+   搜索 `.ledger-demo`。这一段控制 Receipt Ledger 的纸张质感、收据行、表单控件和统计布局。
 
 5. `src/demos/ledger/logic.test.ts`
 
-   Read this file to see the required ledger behaviors.
+   改账本规则前先看测试。它说明添加、删除、统计和损坏存储的预期结果。
 
-## What Each Core File Does
+## 核心文件做什么
 
-- `logic.ts`: data shape, storage, stats, add, delete.
-- `render.ts`: DOM form, FormData reading, list updates.
-- `main.ts`: route selection and mount.
-- `app.css`: ledger paper, receipt rows, form controls.
-- `site.spec.ts`: browser proof for add, delete, refresh, and empty state.
+- `logic.ts`：负责数据形状、分类、存储、安全解析、添加、删除和统计。
+- `render.ts`：负责 DOM 表单、`FormData` 读取、列表刷新和空状态。
+- `main.ts`：负责路由选择和 demo 挂载。
+- `app.css`：负责账本纸面、收据行、金额提示和移动端表单。
+- `site.spec.ts`：用浏览器测试证明添加、删除、刷新保留和空状态可用。
 
-## Beginner Edit Points
+## 新手可改位置
 
-1. Change categories:
+1. 想改分类：
 
-   Edit `LEDGER_CATEGORIES` in `logic.ts`.
+   修改 `logic.ts` 里的 `LEDGER_CATEGORIES`。
 
-2. Change empty copy:
+2. 想改空状态文案：
 
-   Edit `getLedgerEmptyState` in `logic.ts`.
+   修改 `logic.ts` 里的 `getLedgerEmptyState`。
 
-3. Change money display:
+3. 想改金额显示：
 
-   Edit `formatMoney` in `render.ts`.
+   修改 `render.ts` 里的 `formatMoney`。
 
-## Build Tool And Running
+保持一个原则：表单只收集数据，逻辑层改变记录数组，收入、支出和余额永远从记录数组重新计算，不单独存一份。
 
-This project uses Vite as a lightweight static frontend dev/build tool. For a beginner, Vite is the small helper that opens the app in a local browser, reloads when files change, and packages the plain web files for publishing.
+## 构建工具与运行
 
-Run locally:
+这个项目使用 Vite。它负责本地开发服务器、自动刷新，以及把 HTML/CSS/TS 打包成静态文件。
+
+本地运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open the local URL and visit `/#/projects/tiny-ledger/demo`.
+然后打开本地地址，进入 `/#/projects/tiny-ledger/demo`。
 
-Build/check before sharing:
+发布前检查：
 
 ```powershell
 npm run build
 ```
 
-That command type-checks the TypeScript and creates a static `dist/` build.
-
-## Safe Change Rule
-
-The form collects data. Logic changes the record array. Stats are always calculated from records, not stored separately.
+这个命令会做 TypeScript 检查，并创建静态 `dist/` 构建。

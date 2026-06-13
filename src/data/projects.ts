@@ -50,7 +50,7 @@ export const projects: Project[] = [
     docsFolder: "pomodoro",
     links: {
       demo: "#/projects/focus-pomodoro/demo",
-      source: "#/projects/focus-pomodoro?section=source-guide",
+      source: "/source/focus-pomodoro/index.txt",
       docs: "#/projects/focus-pomodoro?section=codex-doc"
     },
     title: "Focus Pomodoro",
@@ -105,7 +105,7 @@ export const projects: Project[] = [
     docsFolder: "memory",
     links: {
       demo: "#/projects/memory-cards/demo",
-      source: "#/projects/memory-cards?section=source-guide",
+      source: "/source/memory-cards/index.txt",
       docs: "#/projects/memory-cards?section=codex-doc"
     },
     title: "Memory Cards",
@@ -160,7 +160,7 @@ export const projects: Project[] = [
     docsFolder: "ledger",
     links: {
       demo: "#/projects/tiny-ledger/demo",
-      source: "#/projects/tiny-ledger?section=source-guide",
+      source: "/source/tiny-ledger/index.txt",
       docs: "#/projects/tiny-ledger?section=codex-doc"
     },
     title: "Tiny Ledger",
@@ -215,7 +215,7 @@ export const projects: Project[] = [
     docsFolder: "habits",
     links: {
       demo: "#/projects/habit-grid/demo",
-      source: "#/projects/habit-grid?section=source-guide",
+      source: "/source/habit-grid/index.txt",
       docs: "#/projects/habit-grid?section=codex-doc"
     },
     title: "Habit Grid",
@@ -270,7 +270,7 @@ export const projects: Project[] = [
     docsFolder: "split",
     links: {
       demo: "#/projects/split-console/demo",
-      source: "#/projects/split-console?section=source-guide",
+      source: "/source/split-console/index.txt",
       docs: "#/projects/split-console?section=codex-doc"
     },
     title: "Split Console",

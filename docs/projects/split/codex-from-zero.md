@@ -1,211 +1,219 @@
-# Split Console: Codex From Zero
+# 分账控制台：Codex 从 0 到 1
 
-## Project Goal
+## 项目目标
 
-Build a pure web split calculator that accepts a total or multiple item amounts, accepts people or participants, calculates per-person result immediately, generates a copyable summary, and blocks invalid input with a visible message.
+做一个纯 Web 分账计算器：可以输入总额或多条明细金额，可以输入人数或参与者，输入变化时立即计算人均金额，生成可复制摘要，并在输入无效时显示错误提示、阻止错误结果。
 
-## Preparation
+## 准备
 
-- Start from an empty folder.
-- Use plain HTML, CSS, and TypeScript or JavaScript.
-- Do not add backend, login, database, API, payment, upload, leaderboard, or comments.
-- Keep calculation and validation in pure functions.
+- 从一个空文件夹开始。
+- 使用普通的 HTML、CSS 和 TypeScript，也可以先用 JavaScript。
+- 不要添加后端、登录、数据库、API、支付、上传、排行榜或评论。
+- 计算和校验写成纯函数。
 
-## From An Empty Folder
+## 从空文件夹开始
 
-Create these files first:
+先创建这些文件：
 
-- `index.html`: app root.
-- `src/main.ts`: imports the renderer and starts the app.
-- `src/demos/split/logic.ts`: parsing, validation, calculation, summary.
-- `src/demos/split/render.ts`: inputs, result panel, copy button.
-- `src/styles/app.css`: Split Console visual motif.
+- `index.html`：页面入口和 app 挂载点。
+- `src/main.ts`：导入渲染器并启动应用。
+- `src/demos/split/logic.ts`：解析、校验、计算和摘要。
+- `src/demos/split/render.ts`：输入区、结果面板和复制按钮。
+- `src/styles/app.css`：Split Console 视觉。
 
-## Starting Prompt
+## 起步 Prompt
 
 Prompt:
 
 ```text
-Create a pure HTML/CSS/TypeScript split calculator from an empty folder. It must accept either a total amount or multiple item amounts, accept people or participant names, calculate the per-person result immediately when inputs change, generate a copyable summary, and show an invalid input message while blocking wrong results. Keep calculation logic in pure functions.
+从空文件夹创建一个纯 HTML/CSS/TypeScript 分账计算器。它必须支持输入总金额，或输入多条明细金额；支持输入人数或参与者名称；当输入变化时立即计算人均结果；生成可复制摘要；输入无效时显示错误提示，并阻止显示错误结果。计算逻辑请放在纯函数里。
 ```
 
-Expected output:
+预期输出：
 
-- A runnable static web app.
-- Inputs for total, items, and participants.
-- A result area with total, per-person amount, error, summary, and copy button.
+- 一个能运行的静态 Web 应用。
+- 有总额、明细和参与者输入。
+- 结果区包含总额、人均金额、错误提示、摘要和复制按钮。
 
-Validation:
+验收方式：
 
-- Enter 120 and three participants.
-- See 40 per person immediately.
-- Enter invalid input and see an error with no wrong result.
-- Copy the valid summary.
+- 输入 120 和 3 个参与者。
+- 立即看到每人 40。
+- 输入无效内容时看到错误，并且没有错误结果。
+- 有效结果可以复制摘要。
 
-## Improvement Prompts
+## 改进 Prompt
 
 Prompt 1:
 
 ```text
-Add a Split Console visual motif with blue console panels, numeric result emphasis, and compact controls that can be completed in under one minute.
+加入 Split Console 视觉：蓝色控制台面板、突出的数字结果，以及一分钟内能完成分账的紧凑控件。
 ```
 
-Expected output:
+预期输出：
 
-- Blue console styling.
-- Immediate result is visually prominent.
+- 有蓝色控制台风格。
+- 即时结果在视觉上很明显。
 
-Validation:
+验收方式：
 
-- User can complete one split with three fields.
-- Mobile layout remains usable.
+- 用户只用几个字段就能完成一次分账。
+- 手机布局仍然可用。
 
 Prompt 2:
 
 ```text
-Add item parsing so users can enter amounts separated by commas, spaces, or new lines.
+增加明细解析，用户可以用逗号、空格或换行输入多个金额。
 ```
 
-Expected output:
+预期输出：
 
-- `12, 8` and `12\n8` both work.
-- Positive numbers are summed.
+- `12, 8` 和 `12\n8` 都能解析。
+- 只把正数加入求和。
 
-Validation:
+验收方式：
 
-- Enter three item values.
-- Result total equals their sum.
+- 输入三个明细金额。
+- 结果总额等于它们的和。
 
 Prompt 3:
 
 ```text
-Make the copy button disabled until a valid result exists and show feedback after copying.
+复制按钮在结果有效前保持禁用；复制成功后显示反馈。
 ```
 
-Expected output:
+预期输出：
 
-- Copy button is blocked for invalid result.
-- Copy status appears after click.
+- 无效结果不能复制。
+- 有效结果复制后出现状态提示。
 
-Validation:
+验收方式：
 
-- Invalid input disables copy.
-- Valid input enables copy and shows copied feedback.
+- 无效输入时复制按钮不可用。
+- 有效输入时复制按钮可用，并显示已复制反馈。
 
-## Troubleshooting Prompts
+## 排错 Prompt
 
 Prompt 1:
 
 ```text
-The result shows NaN. Validate total/items and participants before dividing, and display -- when the result is invalid.
+结果显示 NaN。请在除法前校验总额、明细和参与者，结果无效时显示 --。
 ```
 
-Expected output:
+预期输出：
 
-- No NaN is visible.
-- Error explains what to fix.
+- 页面上不会出现 NaN。
+- 错误提示说明要修什么。
 
-Validation:
+验收方式：
 
-- Leave inputs empty.
-- See placeholders, not NaN.
+- 留空输入。
+- 看到占位结果，而不是 NaN。
 
 Prompt 2:
 
 ```text
-Changing inputs does not update the result. Listen for input events on the form and recalculate from current field values each time.
+修改输入后结果没有更新。请监听表单上的 input 事件，并每次从当前字段重新计算。
 ```
 
-Expected output:
+预期输出：
 
-- Result updates immediately.
-- No submit button is required.
+- 结果立即更新。
+- 不需要提交按钮。
 
-Validation:
+验收方式：
 
-- Type 120, then change it to 90.
-- Per-person amount updates.
+- 输入 120，再改成 90。
+- 人均金额随之变化。
 
 Prompt 3:
 
 ```text
-The summary copies stale text. Generate the copyable summary from the same result object that is currently displayed.
+复制摘要是旧文本。请从当前正在显示的同一个结果对象生成可复制摘要。
 ```
 
-Expected output:
+预期输出：
 
-- Summary and visible result match.
-- Copy uses the current summary.
+- 摘要和可见结果一致。
+- 复制使用当前摘要。
 
-Validation:
+验收方式：
 
-- Change participants.
-- Copy summary.
-- Copied text includes the latest participants.
+- 修改参与者。
+- 复制摘要。
+- 复制出的文字包含最新参与者。
 
-## Remix Prompts
+## 二创 Prompt
 
 Prompt 1:
 
 ```text
-Remix Split Console for a lunch table by changing the copy to mention lunch and keeping the same total, participants, validation, and copy behavior.
+把分账控制台二创成午餐分账工具。摘要文案提到 lunch，但总额、参与者、校验和复制行为保持不变。
 ```
 
-Expected output:
+预期输出：
 
-- Lunch-specific summary copy.
-- Same calculation.
+- 摘要变成午餐场景。
+- 计算规则不变。
 
-Validation:
+验收方式：
 
-- Enter a lunch total and participants.
-- Summary is lunch-themed.
+- 输入午餐总额和参与者。
+- 摘要体现午餐场景。
 
 Prompt 2:
 
 ```text
-Add tip percentage input. Calculate total plus tip before splitting, and include the tip in the copyable summary.
+增加小费百分比输入。先计算总额加小费，再分摊给参与者，并把小费写进可复制摘要。
 ```
 
-Expected output:
+预期输出：
 
-- Tip input.
-- Adjusted total and per-person result.
+- 有小费输入。
+- 总额和人均金额包含小费。
 
-Validation:
+验收方式：
 
-- 100 total, 20% tip, 3 people gives 40 each.
+- 100 总额、20% 小费、3 个人，结果是每人 40。
 
 Prompt 3:
 
 ```text
-Add uneven split weights, where each participant can have a weight like 1x or 2x. Keep validation clear and show each participant's share.
+增加不均等权重分账，每个参与者可以是 1x 或 2x。保持校验清楚，并显示每个人要付的金额。
 ```
 
-Expected output:
+预期输出：
 
-- Weighted participants.
-- Per-person rows.
-- Clear invalid input messages.
+- 参与者有权重。
+- 结果按人显示。
+- 无效权重有提示。
 
-Validation:
+验收方式：
 
-- One 2x participant pays double a 1x participant.
+- 一个 2x 参与者支付金额是 1x 参与者的两倍。
 
-## Running The Project
+## 运行项目
+
+在这个仓库里运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open `/#/projects/split-console/demo`.
+然后打开 `/#/projects/split-console/demo`。
 
-## Validation Checklist
+发布前可以检查一次构建：
 
-- Total or multiple items can be entered.
-- People or participants can be entered.
-- Result updates immediately.
-- Summary is copyable.
-- Invalid input shows a message and blocks wrong results.
-- One split can be completed in under one minute.
+```powershell
+npm run build
+```
+
+## 验收清单
+
+- 可以输入总额或多条明细。
+- 可以输入人数或参与者。
+- 结果会即时更新。
+- 摘要可以复制。
+- 无效输入显示提示，并阻止错误结果。
+- 一次分账能在一分钟内完成。

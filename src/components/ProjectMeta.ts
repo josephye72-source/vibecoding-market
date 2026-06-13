@@ -1,4 +1,6 @@
 import type { Project } from "../data/projects";
+import { dictionaries, getProjectText } from "../i18n/dictionaries";
+import type { Locale } from "../i18n/types";
 
 export function escapeHtml(value: string): string {
   return value
@@ -15,24 +17,27 @@ export function renderSkillTags(skills: string[]): string {
     .join("");
 }
 
-export function renderProjectMeta(project: Project): string {
+export function renderProjectMeta(project: Project, locale: Locale): string {
+  const copy = dictionaries[locale].projectDetail;
+  const text = getProjectText(project, locale);
+
   return `
-    <dl class="project-meta" aria-label="${escapeHtml(project.title)} metadata">
+    <dl class="project-meta" aria-label="${escapeHtml(copy.metadataLabel.replace("{title}", text.title))}">
       <div>
-        <dt>难度</dt>
-        <dd>${escapeHtml(project.difficulty)}</dd>
+        <dt>${copy.difficulty}</dt>
+        <dd>${escapeHtml(text.difficulty)}</dd>
       </div>
       <div>
-        <dt>预计复现时间</dt>
-        <dd>${escapeHtml(project.estimatedTime)}</dd>
+        <dt>${copy.estimatedTime}</dt>
+        <dd>${escapeHtml(text.estimatedTime)}</dd>
       </div>
       <div>
-        <dt>路径角色</dt>
-        <dd>${escapeHtml(project.role)}</dd>
+        <dt>${copy.role}</dt>
+        <dd>${escapeHtml(text.role)}</dd>
       </div>
       <div>
-        <dt>视觉母题</dt>
-        <dd>${escapeHtml(project.visualMotif)}</dd>
+        <dt>${copy.visualMotif}</dt>
+        <dd>${escapeHtml(text.visualMotif)}</dd>
       </div>
     </dl>
   `;

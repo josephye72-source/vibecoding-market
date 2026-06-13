@@ -1,29 +1,29 @@
-# Tiny Ledger FAQ
+# 账本小记：常见问题
 
-## 1. Why do totals not update after adding a record?
+## 1. 为什么添加记录后统计没有更新？
 
-Recalculate stats from the current records array after every add.
+每次添加后，都要从最新的 records 数组重新计算收入、支出和余额。
 
-## 2. Why does delete remove the wrong record?
+## 2. 为什么删除时删错了记录？
 
-Delete by the record id, not by the visible row index.
+删除要按记录 id 做，不要按当前可见行号做。列表排序或过滤后，行号很容易变化。
 
-## 3. Why do records disappear after refresh?
+## 3. 为什么刷新后记录消失？
 
-Make sure add and delete write the full records array to the same localStorage key that initial state reads.
+确认添加和删除都会把完整 records 数组写回同一个 `localStorage` key，初始状态也从这个 key 读取。
 
-## 4. Why does the empty state still show after adding a record?
+## 4. 为什么添加记录后空状态还在？
 
-Repaint the list after changing state. The empty state should render only when `records.length === 0`.
+改完状态后要重新渲染列表。空状态只应该在 `records.length === 0` 时出现。
 
-## 5. Why does a negative amount break the balance?
+## 5. 为什么负数金额会把余额算乱？
 
-Validate that amount is a positive finite number before creating a record.
+创建记录前先校验 amount，只有正的有限数字才能加入 records。
 
-## 6. Why is the form hard to use on mobile?
+## 6. 为什么手机上表单不好用？
 
-Labels and inputs should stack, and every input/button should keep at least a 44px height.
+标签和输入框在小屏上应该上下排列，每个输入框和按钮高度至少保持 44px。
 
-## 7. Why does corrupt localStorage crash the app?
+## 7. 为什么损坏的 localStorage 会让应用崩掉？
 
-Wrap JSON parsing in `try/catch` and fall back to `[]`.
+JSON 解析要放进 `try/catch`。失败时回退到空数组 `[]`，让页面继续显示空账本。

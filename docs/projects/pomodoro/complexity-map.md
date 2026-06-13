@@ -1,61 +1,59 @@
-# Focus Pomodoro Complexity Map
+# 专注番茄钟：复杂度拆解
 
-## Page Structure
+## 页面结构
 
-The page has four visible zones:
+页面有四块可见区域：
 
-- Intro: project title and what to do first.
-- Dial: countdown and circular progress.
-- Controls: mode switch plus Start, Pause, Reset.
-- Record: status, completed today, and completion feedback.
+- 介绍区：说明这是番茄钟，以及第一步应该做什么。
+- 计时盘：显示倒计时和圆形进度。
+- 控制区：切换专注/休息模式，并提供 Start、Pause、Reset。
+- 记录区：显示当前状态、今天完成次数和完成反馈。
 
-The structure is simple, but it must keep the first action visible on both desktop and mobile.
+结构不复杂，但第一步操作必须在桌面和手机上都明显可见。
 
-## Interaction
+## 交互
 
-The timer has a small state machine:
+番茄钟本质上是一个小状态机：
 
-- `idle`: ready to start.
-- `running`: countdown decreases every second.
-- `paused`: countdown stays still.
-- `complete`: session ended and feedback appears.
+- `idle`：准备开始。
+- `running`：每秒减少剩余时间。
+- `paused`：倒计时停住。
+- `complete`：本轮结束，显示完成反馈。
 
-Buttons do not navigate. They change state immediately.
+按钮不会跳转页面，只会立即改变当前状态。这里最容易出错的是重复点击 Start 后创建多个 interval。
 
-## State
+## 状态
 
-The main state values are:
+主要状态包括：
 
-- selected mode: `focus` or `break`.
-- status: `idle`, `running`, `paused`, or `complete`.
-- remaining seconds.
-- total seconds for the selected mode.
-- today's completed focus count.
-- message shown in the live feedback area.
+- 当前模式：`focus` 或 `break`。
+- 当前状态：`idle`、`running`、`paused` 或 `complete`。
+- 剩余秒数。
+- 当前模式总秒数。
+- 今天完成的专注次数。
+- live feedback 区域要显示的提示文案。
 
-## Data
+把这些状态集中在逻辑层，渲染层只负责显示，会让测试更稳定。
 
-Only one local record is saved:
+## 数据
+
+只保存一条本地记录，例如：
 
 ```json
 { "date": "2026-06-13", "completed": 1 }
 ```
 
-The app falls back to 0 if the record is missing, from another date, or corrupt. No account, backend, database, or API is used.
+如果记录不存在、日期不是今天，或者 JSON 损坏，应用应该回退到 0。这里不需要账号、后端、数据库或 API。
 
-## Visual Completion
+## 视觉完成度
 
-The Solar Dial motif is created with:
+Solar Dial 的完成感来自这些元素：
 
-- warm yellow progress color.
-- amber cockpit panel.
-- circular dial.
-- tabular countdown numerals.
-- pressed mode state.
-- immediate status and completion feedback.
+- 暖黄色进度。
+- 琥珀色控制面板。
+- 圆形计时盘。
+- 等宽倒计时数字。
+- 被按下的模式按钮状态。
+- 及时出现的暂停、完成和计数反馈。
 
-The visual complexity serves the timer. It does not add heavy 3D, WebGL, or assets a beginner cannot reproduce.
-
-## Testing Complexity
-
-The production timer uses 25 minutes, which is too long for direct waiting in automated tests. Keep duration overrides inside pure logic tests or test-only browser setup; the public route keeps the normal production durations.
+视觉服务于计时器，不应该引入重 3D、WebGL 或新手难以复现的大型资源。

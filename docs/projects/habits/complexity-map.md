@@ -1,46 +1,52 @@
-# Habit Grid Complexity Map
+# 习惯方格：复杂度拆解
 
-## Page Structure
+## 页面结构
 
-The demo has three zones:
+demo 有三块区域：
 
-- Intro: project title and goal.
-- Summary: month label, monthly count, streak, feedback.
-- Grid: one button per date in the current month.
+- 介绍区：说明项目目标。
+- 汇总区：显示月份、月度打卡次数、连续天数和反馈。
+- 网格区：当月每天一个按钮。
 
-## Interaction
+页面要像日历一样清楚，但不能复杂到像完整日程软件。
 
-The user toggles a date:
+## 交互
 
-- Unchecked becomes checked.
-- Checked becomes unchecked.
-- Stats update immediately.
-- The checked array is saved.
+用户点击某个日期时：
 
-## State
+- 未勾选会变成已勾选。
+- 已勾选会变回未勾选。
+- 月度统计和连续天数立即更新。
+- 最新的勾选日期数组会保存。
 
-State contains:
+这个项目的交互简单，难点是日期计算必须稳定。
 
-- year.
-- month index.
-- today key.
-- checked date keys.
-- generated day objects.
+## 状态
 
-## Data
+状态包含：
 
-Only checked date keys are saved in localStorage. There is no account, backend, database, API, upload, leaderboard, or comments.
+- 年份。
+- 月份索引。
+- 今天的日期 key。
+- 已勾选日期 key 数组。
+- 当前月份生成出来的日期对象。
 
-## Visual Completion
+测试时最好传入固定的年、月和今天 key，避免因为真实日期变化导致预期漂移。
 
-Growth Grid uses:
+## 数据
 
-- green grid lines.
-- square date rhythm.
-- today outline.
-- checked green fill.
-- monthly and streak feedback.
+只把已勾选的日期 key 保存到 `localStorage`。
 
-## Testing Complexity
+没有账号、后端、数据库、API、上传、排行榜或评论。
 
-Dates can be difficult because today's date changes. Tests pass a fixed year, month, and today key to keep expectations stable.
+## 视觉完成度
+
+Growth Grid 的完成感来自这些元素：
+
+- 绿色网格节奏。
+- 方形日期按钮。
+- 今天的描边状态。
+- 已勾选的绿色填充。
+- 月度次数和连续天数反馈。
+
+已勾选状态最好不只靠颜色，还要有边框、填充或 `aria-pressed` 等辅助表达。

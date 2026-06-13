@@ -3,8 +3,9 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { renderProjectDetail } from "../components/ProjectDetail";
-import { projectDocs, requiredProjectDocKinds } from "./projectDocs";
+import { getLocalizedProjectDocs, projectDocs, requiredProjectDocKinds } from "./projectDocs";
 import { projects } from "./projects";
+import { sourceEntriesByProject } from "./sourceEntries";
 
 function filePathFromImportMetaUrl(importMetaUrl: string): string {
   const url = new URL(importMetaUrl);
@@ -23,11 +24,15 @@ function filePathFromImportMetaUrl(importMetaUrl: string): string {
 const repoRoot = resolve(dirname(filePathFromImportMetaUrl(import.meta.url)), "../..");
 
 const requiredDocs = [
-  { kind: "codex-from-zero", fileName: "codex-from-zero.md", label: "Codex From Zero" },
-  { kind: "source-guide", fileName: "source-guide.md", label: "Source Guide" },
-  { kind: "complexity-map", fileName: "complexity-map.md", label: "Complexity Map" },
-  { kind: "faq", fileName: "faq.md", label: "FAQ" },
-  { kind: "remix-prompts", fileName: "remix-prompts.md", label: "Remix Prompts" }
+  {
+    kind: "codex-from-zero",
+    fileName: "codex-from-zero.md",
+    labels: { zh: "Codex 从 0 到 1", en: "Codex From Zero" }
+  },
+  { kind: "source-guide", fileName: "source-guide.md", labels: { zh: "源码导览", en: "Source Guide" } },
+  { kind: "complexity-map", fileName: "complexity-map.md", labels: { zh: "复杂度拆解", en: "Complexity Map" } },
+  { kind: "faq", fileName: "faq.md", labels: { zh: "常见问题", en: "FAQ" } },
+  { kind: "remix-prompts", fileName: "remix-prompts.md", labels: { zh: "二创任务", en: "Remix Prompts" } }
 ] as const;
 
 function repoPathFor(projectFolder: string, fileName: string): string {
@@ -72,11 +77,15 @@ function countNumberedItems(content: string): number {
 }
 
 function countPromptItems(content: string): number {
-  return content.match(/^Prompt\s+\d+:/gim)?.length ?? 0;
+  return content.match(/^Prompt\s+\d+[:：]/gim)?.length ?? 0;
 }
 
 function expectHeading(content: string, heading: string): void {
   expect(content).toMatch(new RegExp(`^## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "im"));
+}
+
+function expectNoHeading(content: string, heading: string): void {
+  expect(content).not.toMatch(new RegExp(`^## ${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`, "im"));
 }
 
 describe("project documentation registry", () => {
@@ -124,9 +133,16 @@ describe("project documentation registry", () => {
       expect(new Set(docs.map((doc) => doc.kind)).size).toBe(5);
 
       for (const [index, doc] of docs.entries()) {
-        expect(doc.label).toBe(requiredDocs[index].label);
         expect(doc.fileName).toBe(requiredDocs[index].fileName);
         expect(doc.projectSlug).toBe(project.slug);
+      }
+
+      for (const locale of ["zh", "en"] as const) {
+        const localizedDocs = getLocalizedProjectDocs(project.slug, locale);
+
+        expect(localizedDocs.map((doc) => doc.label)).toEqual(
+          requiredDocs.map((doc) => doc.labels[locale])
+        );
       }
     }
   });
@@ -165,14 +181,16 @@ describe("project documentation registry", () => {
       expect(project.visualMotif).toBeTruthy();
       expect(project.docsFolder).toBeTruthy();
       expect(project.links.demo).toBe(`#/projects/${project.slug}/demo`);
-      expect(project.links.source).toBe(`#/projects/${project.slug}?section=source-guide`);
+      expect(project.links.source).toBe(sourceEntriesByProject[project.slug]?.indexHref);
+      expect(project.links.source).not.toContain("?section=source-guide");
+      expect(project.links.source).not.toMatch(/^#\//);
       expect(project.links.docs).toBe(`#/projects/${project.slug}?section=codex-doc`);
     }
   });
 
   it("renders detail page links from project metadata and the centralized doc registry", () => {
     for (const project of projects) {
-      const html = renderProjectDetail(project);
+      const html = renderProjectDetail(project, "zh");
 
       expect(html).toContain(`href="${project.links.demo}"`);
       expect(html).toContain(`href="${project.links.source}"`);
@@ -190,13 +208,17 @@ describe("project markdown requirements", () => {
     for (const project of projects) {
       const sourceGuide = projectDocs[project.slug].find((doc) => doc.kind === "source-guide");
       const content = readRepoFile(sourceGuide?.repoPath ?? "");
-      const beginnerSection = extractMarkdownSection(content, "Beginner Edit Points");
+      const beginnerSection = extractMarkdownSection(content, "新手可改位置");
 
-      expectHeading(content, "Read These Files First");
-      expectHeading(content, "What Each Core File Does");
-      expectHeading(content, "Beginner Edit Points");
+      expectHeading(content, "先看这些文件");
+      expectHeading(content, "核心文件做什么");
+      expectHeading(content, "新手可改位置");
       expect(countNumberedItems(beginnerSection)).toBeGreaterThanOrEqual(3);
-      expectHeading(content, "Build Tool And Running");
+      expectHeading(content, "构建工具与运行");
+      expectNoHeading(content, "Read These Files First");
+      expectNoHeading(content, "What Each Core File Does");
+      expectNoHeading(content, "Beginner Edit Points");
+      expectNoHeading(content, "Build Tool And Running");
       expect(content).toMatch(/\bVite\b/);
       expect(content).toMatch(/npm run dev/);
       expect(content).toMatch(/npm run build/);
@@ -204,7 +226,7 @@ describe("project markdown requirements", () => {
   });
 
   it("keeps every complexity map organized around the five required categories", () => {
-    const requiredCategories = ["Page Structure", "Interaction", "State", "Data", "Visual Completion"];
+    const requiredCategories = ["页面结构", "交互", "状态", "数据", "视觉完成度"];
 
     for (const project of projects) {
       const complexityMap = projectDocs[project.slug].find((doc) => doc.kind === "complexity-map");
@@ -212,6 +234,10 @@ describe("project markdown requirements", () => {
 
       for (const category of requiredCategories) {
         expectHeading(content, category);
+      }
+
+      for (const oldCategory of ["Page Structure", "Interaction", "State", "Data", "Visual Completion"]) {
+        expectNoHeading(content, oldCategory);
       }
     }
   });
@@ -221,7 +247,7 @@ describe("project markdown requirements", () => {
       const faq = projectDocs[project.slug].find((doc) => doc.kind === "faq");
       const content = readRepoFile(faq?.repoPath ?? "");
 
-      expect(content.match(/^##\s+\d+\.\s+.+\?/gm)?.length ?? 0).toBeGreaterThanOrEqual(5);
+      expect(content.match(/^##\s+\d+\.\s+.+[？?]/gm)?.length ?? 0).toBeGreaterThanOrEqual(5);
     }
   });
 
@@ -230,23 +256,26 @@ describe("project markdown requirements", () => {
       const remixPrompts = projectDocs[project.slug].find((doc) => doc.kind === "remix-prompts");
       const content = readRepoFile(remixPrompts?.repoPath ?? "");
 
-      expectHeading(content, "Light Remix");
-      expectHeading(content, "Medium Remix");
-      expectHeading(content, "Deep Remix");
+      expectHeading(content, "轻改");
+      expectHeading(content, "中改");
+      expectHeading(content, "深改");
+      expectNoHeading(content, "Light Remix");
+      expectNoHeading(content, "Medium Remix");
+      expectNoHeading(content, "Deep Remix");
     }
   });
 
   it("keeps every Codex-from-zero guide complete enough to reproduce", () => {
     const requiredBlocks = [
-      "Project Goal",
-      "Preparation",
-      "From An Empty Folder",
-      "Starting Prompt",
-      "Improvement Prompts",
-      "Troubleshooting Prompts",
-      "Remix Prompts",
-      "Running The Project",
-      "Validation Checklist"
+      "项目目标",
+      "准备",
+      "从空文件夹开始",
+      "起步 Prompt",
+      "改进 Prompt",
+      "排错 Prompt",
+      "二创 Prompt",
+      "运行项目",
+      "验收清单"
     ];
 
     for (const project of projects) {
@@ -257,11 +286,27 @@ describe("project markdown requirements", () => {
         expectHeading(content, block);
       }
 
-      expect(content).toMatch(/Expected output:/i);
+      for (const oldBlock of [
+        "Project Goal",
+        "Preparation",
+        "From An Empty Folder",
+        "Starting Prompt",
+        "Improvement Prompts",
+        "Troubleshooting Prompts",
+        "Remix Prompts",
+        "Running The Project",
+        "Validation Checklist"
+      ]) {
+        expectNoHeading(content, oldBlock);
+      }
+
+      expect(content).toMatch(/Expected output:|预期输出：?/i);
       expect(content).toMatch(/`index\.html`/);
-      expect(countPromptItems(extractMarkdownSection(content, "Improvement Prompts"))).toBeGreaterThanOrEqual(3);
-      expect(countPromptItems(extractMarkdownSection(content, "Troubleshooting Prompts"))).toBeGreaterThanOrEqual(3);
-      expect(countPromptItems(extractMarkdownSection(content, "Remix Prompts"))).toBeGreaterThanOrEqual(3);
+      expect(content).toMatch(/npm run dev/);
+      expect(content).toMatch(/npm run build/);
+      expect(countPromptItems(extractMarkdownSection(content, "改进 Prompt"))).toBeGreaterThanOrEqual(3);
+      expect(countPromptItems(extractMarkdownSection(content, "排错 Prompt"))).toBeGreaterThanOrEqual(3);
+      expect(countPromptItems(extractMarkdownSection(content, "二创 Prompt"))).toBeGreaterThanOrEqual(3);
     }
   });
 });

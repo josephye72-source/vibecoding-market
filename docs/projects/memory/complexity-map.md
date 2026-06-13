@@ -1,48 +1,54 @@
-# Memory Cards Complexity Map
+# 记忆翻牌：复杂度拆解
 
-## Page Structure
+## 页面结构
 
-The demo has three visible zones:
+demo 有三块可见区域：
 
-- Intro: project title and goal.
-- HUD: moves, status feedback, restart.
-- Board: 12 card buttons in a responsive grid.
+- 介绍区：说明游戏目标。
+- HUD：显示步数、状态反馈和重新开始按钮。
+- 棋盘：12 张卡牌按钮，放在响应式网格里。
 
-## Interaction
+页面结构很直接，难点在于每张卡的状态要清楚，手机上也要容易点击。
 
-The game loop is:
+## 交互
 
-- Flip first card.
-- Flip second card.
-- If pair ids match, keep both cards open.
-- If pair ids differ, show mismatch and close them.
-- Restart creates a new board.
+核心循环是：
 
-## State
+- 翻开第一张卡。
+- 翻开第二张卡。
+- 如果两张卡的 pair id 相同，就保持打开。
+- 如果 pair id 不同，就先显示不匹配反馈，再把它们翻回去。
+- 点击 Restart 会创建一局新的洗牌棋盘。
 
-The state tracks:
+不匹配反馈期间要锁住棋盘，避免玩家翻开第三张卡。
 
-- cards with id, pair id, symbol, face-up, and matched flags.
-- moves.
-- feedback state.
-- locked state during mismatch feedback.
-- complete state after all pairs match.
+## 状态
 
-## Data
+状态需要记录：
 
-No saved data is required. A new shuffled card array is created for each game. There is no backend, database, login, API, leaderboard, or comment system.
+- 每张卡的 id、pair id、符号、是否翻开、是否已配对。
+- 已尝试的步数。
+- 当前反馈文案。
+- 不匹配反馈期间的锁定状态。
+- 所有卡牌配对后的完成状态。
 
-## Visual Completion
+随机洗牌可以在真实游戏里保持随机，但测试里应该传入固定随机函数，让预期可重复。
 
-The Neon Arcade Lab motif uses:
+## 数据
 
-- purple/pink glow.
-- square card grid.
-- face-down mystery state.
-- bright face-up state.
-- matched glow.
-- immediate status feedback.
+这个项目不需要长期保存数据。每次新游戏都会生成一组新的卡牌数组。
 
-## Testing Complexity
+没有后端、数据库、登录、API、排行榜或评论系统。
 
-Shuffle is random in the browser, so tests pass a fixed random function. This makes the rules predictable without making the real game predictable.
+## 视觉完成度
+
+Neon Arcade Lab 的完成感来自这些元素：
+
+- 紫色和粉色发光。
+- 方形卡牌网格。
+- 背面未知状态。
+- 翻开后的高亮状态。
+- 已匹配的稳定发光。
+- 立即出现的匹配、不匹配和胜利反馈。
+
+视觉状态要帮助玩家理解规则，而不是只做装饰。

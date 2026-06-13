@@ -7,6 +7,7 @@ import { mountMemoryDemo, renderMemoryDemo } from "./demos/memory/render";
 import { mountPomodoroDemo, renderPomodoroDemo } from "./demos/pomodoro/render";
 import { DEFAULT_POMODORO_DURATIONS, type PomodoroDurations } from "./demos/pomodoro/logic";
 import { mountSplitDemo, renderSplitDemo } from "./demos/split/render";
+import { nextLocale, getStoredLocale, storeLocale, syncDocumentLocale, type Locale } from "./i18n/state";
 import { getRoute } from "./lib/router";
 import "./styles/tokens.css";
 import "./styles/base.css";
@@ -20,6 +21,7 @@ if (!app) {
 
 const appRoot = app;
 let cleanupDemo: (() => void) | undefined;
+let currentLocale: Locale = getStoredLocale();
 
 declare global {
   interface ImportMeta {
@@ -50,80 +52,88 @@ function getDemoDurations(): PomodoroDurations {
   return DEFAULT_POMODORO_DURATIONS;
 }
 
-function renderRoute(path: string): string {
+function renderRoute(path: string, locale: Locale): string {
   const projectDetailMatch = path.match(/^\/projects\/([^/]+)$/);
   const projectDemoMatch = path.match(/^\/projects\/([^/]+)\/demo$/);
 
   if (path === "/") {
-    return renderHomePage();
+    return renderHomePage(locale);
   }
 
   if (projectDetailMatch) {
     const project = findProject(projectDetailMatch[1]);
-    return project ? renderProjectDetail(project) : renderNotFound();
+    return project ? renderProjectDetail(project, locale) : renderNotFound(locale);
   }
 
   if (projectDemoMatch) {
     const project = findProject(projectDemoMatch[1]);
 
     if (!project) {
-      return renderNotFound();
+      return renderNotFound(locale);
     }
 
     if (project.slug === "focus-pomodoro") {
-      return renderPomodoroDemo();
+      return renderPomodoroDemo(locale);
     }
 
     if (project.slug === "memory-cards") {
-      return renderMemoryDemo();
+      return renderMemoryDemo(locale);
     }
 
     if (project.slug === "tiny-ledger") {
-      return renderLedgerDemo();
+      return renderLedgerDemo(locale);
     }
 
     if (project.slug === "habit-grid") {
-      return renderHabitDemo();
+      return renderHabitDemo(locale);
     }
 
     if (project.slug === "split-console") {
-      return renderSplitDemo();
+      return renderSplitDemo(locale);
     }
 
-    return renderDemoPending(project);
+    return renderDemoPending(project, locale);
   }
 
-  return renderNotFound();
+  return renderNotFound(locale);
 }
 
 function renderApp(): void {
   cleanupDemo?.();
   cleanupDemo = undefined;
+  syncDocumentLocale(currentLocale);
 
   const route = getRoute(window.location.hash);
   appRoot.innerHTML = renderAppShell({
-    content: renderRoute(route.path),
-    currentPath: route.path
+    content: renderRoute(route.path, currentLocale),
+    currentPath: route.path,
+    locale: currentLocale
+  });
+
+  appRoot.querySelector<HTMLButtonElement>("[data-locale-toggle]")?.addEventListener("click", () => {
+    currentLocale = nextLocale(currentLocale);
+    storeLocale(currentLocale);
+    renderApp();
   });
 
   if (route.path === "/projects/focus-pomodoro/demo") {
-    cleanupDemo = mountPomodoroDemo({ durations: getDemoDurations() });
+    cleanupDemo = mountPomodoroDemo({ durations: getDemoDurations(), locale: currentLocale });
   }
 
   if (route.path === "/projects/memory-cards/demo") {
-    cleanupDemo = mountMemoryDemo();
+    cleanupDemo = mountMemoryDemo(currentLocale);
   }
 
   if (route.path === "/projects/tiny-ledger/demo") {
-    cleanupDemo = mountLedgerDemo();
+    cleanupDemo = mountLedgerDemo(currentLocale);
   }
 
   if (route.path === "/projects/habit-grid/demo") {
-    cleanupDemo = mountHabitDemo();
+    cleanupDemo = mountHabitDemo(currentLocale);
   }
 
   if (route.path === "/projects/split-console/demo") {
-    cleanupDemo = mountSplitDemo();
+    cleanupDemo = mountSplitDemo(currentLocale);
   }
 
   if (route.anchor) {

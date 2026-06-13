@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { projects } from "./projects";
+import { sourceEntriesByProject } from "./sourceEntries";
 
 describe("V1 project metadata", () => {
   it("contains exactly five projects", () => {
@@ -26,7 +27,9 @@ describe("V1 project metadata", () => {
       const links = (project as { links?: { demo?: string; source?: string; docs?: string } }).links;
 
       expect(links?.demo).toBe(`#/projects/${project.slug}/demo`);
-      expect(links?.source).toBeTruthy();
+      expect(links?.source).toBe(sourceEntriesByProject[project.slug]?.indexHref);
+      expect(links?.source).not.toContain("?section=source-guide");
+      expect(links?.source).not.toMatch(/^#\//);
       expect(links?.docs).toBeTruthy();
     }
   });

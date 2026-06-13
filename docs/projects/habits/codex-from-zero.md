@@ -1,213 +1,221 @@
-# Habit Grid: Codex From Zero
+# 习惯方格：Codex 从 0 到 1
 
-## Project Goal
+## 项目目标
 
-Build a pure web habit calendar that displays a monthly grid, toggles today or a selected date, gives checked-state feedback, shows monthly count or streak, persists in `localStorage`, and includes empty, checked, and streak feedback states.
+做一个纯 Web 习惯日历：显示当月方格，可以切换今天或任意日期的勾选状态，显示已勾选反馈、月度次数或连续天数，数据保存到 `localStorage`，并包含空状态、已勾选状态和连续天数反馈。
 
-## Preparation
+## 准备
 
-- Start from an empty folder.
-- Use plain HTML, CSS, and TypeScript or JavaScript.
-- Do not add a backend, login, database, API, upload, leaderboard, or comments.
-- Keep date generation and streak calculations in pure functions.
+- 从一个空文件夹开始。
+- 使用普通的 HTML、CSS 和 TypeScript，也可以先用 JavaScript。
+- 不要添加后端、登录、数据库、API、上传、排行榜或评论。
+- 日期生成和连续天数计算写成纯函数。
 
-## From An Empty Folder
+## 从空文件夹开始
 
-Create these files first:
+先创建这些文件：
 
-- `index.html`: app root.
-- `src/main.ts`: imports the renderer and starts the app.
-- `src/demos/habits/logic.ts`: date grid, toggle, count, streak, storage.
-- `src/demos/habits/render.ts`: calendar buttons and feedback.
-- `src/styles/app.css`: Growth Grid visual motif.
+- `index.html`：页面入口和 app 挂载点。
+- `src/main.ts`：导入渲染器并启动应用。
+- `src/demos/habits/logic.ts`：日期网格、切换、统计、连续天数和存储。
+- `src/demos/habits/render.ts`：日历按钮和反馈区。
+- `src/styles/app.css`：Growth Grid 视觉。
 
-## Starting Prompt
+## 起步 Prompt
 
 Prompt:
 
 ```text
-Create a pure HTML/CSS/TypeScript habit calendar from an empty folder. It must show a monthly grid, let the user toggle today or a selected date, show checked feedback, show monthly count or current streak, persist checked dates in localStorage, and include empty, checked, and streak feedback states. Keep date logic in pure functions.
+从空文件夹创建一个纯 HTML/CSS/TypeScript 习惯日历。它必须显示当月网格，让用户切换今天或某个日期的勾选状态，显示已勾选反馈，显示月度次数或当前连续天数，把已勾选日期保存到 localStorage，并包含空状态、已勾选状态和连续天数反馈。日期逻辑请放在纯函数里。
 ```
 
-Expected output:
+预期输出：
 
-- A runnable static web app.
-- A visible month grid.
-- Date buttons with checked state.
-- Stats and status feedback.
+- 一个能运行的静态 Web 应用。
+- 可见的月份网格。
+- 日期按钮有已勾选状态。
+- 有统计和状态反馈。
 
-Validation:
+验收方式：
 
-- Click a date and see it become checked.
-- Monthly count increases.
-- Refresh keeps the checked date.
-- Feedback changes from empty to checked.
+- 点击一个日期后，它变成已勾选。
+- 月度次数增加。
+- 刷新后该日期仍然勾选。
+- 反馈从空状态变成已勾选状态。
 
-## Improvement Prompts
+## 改进 Prompt
 
 Prompt 1:
 
 ```text
-Add a Growth Grid motif with green square rhythm, clear today state, checked state, and compact monthly/streak stats.
+加入 Growth Grid 视觉：绿色方格节奏、清楚的今天状态、已勾选状态，以及紧凑的月度次数和连续天数统计。
 ```
 
-Expected output:
+预期输出：
 
-- Green grid visual language.
-- Today and checked states are distinct.
+- 有绿色网格视觉。
+- 今天和已勾选状态明显不同。
 
-Validation:
+验收方式：
 
-- Today is visible.
-- Checked dates are clearly different.
+- 今天的格子可见。
+- 已勾选日期能一眼分辨。
 
 Prompt 2:
 
 ```text
-Add current streak calculation based on consecutive checked dates ending today.
+增加当前连续天数计算，规则是从今天开始往前数连续勾选日期。
 ```
 
-Expected output:
+预期输出：
 
-- Streak stat.
-- Streak feedback when two or more consecutive days are checked.
+- 有连续天数统计。
+- 连续两天或更多时显示连续反馈。
 
-Validation:
+验收方式：
 
-- Check yesterday and today.
-- Streak shows 2.
+- 勾选昨天和今天。
+- 连续天数显示 2。
 
 Prompt 3:
 
 ```text
-Make localStorage safe. If saved checked dates are missing or corrupt, show an empty grid instead of crashing.
+让 localStorage 安全可用。如果保存的勾选日期缺失或损坏，页面显示空网格，不要崩掉。
 ```
 
-Expected output:
+预期输出：
 
-- Safe parsing.
-- Empty fallback.
+- JSON 安全解析。
+- 失败时回退为空数组。
 
-Validation:
+验收方式：
 
-- Put invalid JSON in storage.
-- Reload and see the grid.
+- 往 storage 放入无效 JSON。
+- 刷新后仍然看到日历网格。
 
-## Troubleshooting Prompts
+## 排错 Prompt
 
 Prompt 1:
 
 ```text
-The checked state disappears after refresh. Check that toggle writes the checked date array to localStorage and initial state reads it.
+刷新后勾选状态消失。请检查 toggle 是否把已勾选日期数组写入 localStorage，并让初始状态读取它。
 ```
 
-Expected output:
+预期输出：
 
-- One storage key for checked dates.
-- Initial render uses saved dates.
+- 已勾选日期使用同一个 storage key。
+- 初始渲染使用保存过的日期。
 
-Validation:
+验收方式：
 
-- Check a date.
-- Refresh.
-- Date remains checked.
+- 勾选一个日期。
+- 刷新页面。
+- 日期仍然勾选。
 
 Prompt 2:
 
 ```text
-Today is highlighted on the wrong day. Use a stable YYYY-MM-DD date key and compare date keys, not display text.
+今天高亮到了错误日期。请使用稳定的 YYYY-MM-DD 日期 key，并比较日期 key，不要比较展示文本。
 ```
 
-Expected output:
+预期输出：
 
-- Stable date key helper.
-- Today comparison uses the same format.
+- 有稳定的日期 key helper。
+- 今天判断使用同一种格式。
 
-Validation:
+验收方式：
 
-- Today's button has the today style.
+- 今天的按钮拥有 today 样式。
 
 Prompt 3:
 
 ```text
-The streak count is too high. Count backward from today and stop at the first unchecked date.
+连续天数算得太高。请从今天往前数，遇到第一个未勾选日期就停止。
 ```
 
-Expected output:
+预期输出：
 
-- Streak only covers consecutive checked dates.
-- Gaps stop the streak.
+- 连续天数只覆盖连续勾选日期。
+- 中间有空缺时会停止。
 
-Validation:
+验收方式：
 
-- Check today and two days ago but not yesterday.
-- Streak is 1.
+- 勾选今天和前天，不勾选昨天。
+- 连续天数是 1。
 
-## Remix Prompts
+## 二创 Prompt
 
 Prompt 1:
 
 ```text
-Remix Habit Grid into a reading tracker. Change copy to pages read and keep one checked square per reading day.
+把习惯方格二创成阅读记录器。文案改成阅读页数或阅读日，仍然保持每天一个可勾选方格。
 ```
 
-Expected output:
+预期输出：
 
-- Reading-specific copy.
-- Same date toggle logic.
+- 文案变成阅读场景。
+- 日期切换逻辑不变。
 
-Validation:
+验收方式：
 
-- Check a reading day.
-- Refresh preserves it.
+- 勾选一个阅读日。
+- 刷新后仍然保留。
 
 Prompt 2:
 
 ```text
-Add a note for each checked date. Keep the date checked even when the note is empty.
+给每个已勾选日期增加备注。备注可以为空，但日期仍然保持勾选。
 ```
 
-Expected output:
+预期输出：
 
-- Optional note input.
-- Data shape can store notes by date.
+- 有可选备注输入。
+- 数据结构能按日期保存备注。
 
-Validation:
+验收方式：
 
-- Add a note to a date.
-- Refresh keeps the note.
+- 给某天添加备注。
+- 刷新后备注仍然存在。
 
 Prompt 3:
 
 ```text
-Support three habits in one grid by storing checked dates per habit name and switching between habits.
+在一个网格里支持三个习惯：按习惯名称分别保存已勾选日期，并可以切换当前习惯。
 ```
 
-Expected output:
+预期输出：
 
-- Habit selector.
-- Separate checked dates per habit.
+- 有习惯选择器。
+- 每个习惯有独立勾选日期。
 
-Validation:
+验收方式：
 
-- Check one habit.
-- Switch habits.
-- The first habit's check does not appear on the second.
+- 在习惯 A 勾选一天。
+- 切换到习惯 B。
+- 习惯 A 的勾选不会出现在习惯 B。
 
-## Running The Project
+## 运行项目
+
+在这个仓库里运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open `/#/projects/habit-grid/demo`.
+然后打开 `/#/projects/habit-grid/demo`。
 
-## Validation Checklist
+发布前可以检查一次构建：
 
-- Calendar/grid is visible.
-- User can toggle a date.
-- Checked state has clear visual feedback.
-- Monthly count or streak is visible.
-- Data persists after refresh.
-- Empty, checked, and streak feedback states exist.
+```powershell
+npm run build
+```
+
+## 验收清单
+
+- 日历或方格网格可见。
+- 用户可以切换某个日期。
+- 已勾选状态有清楚视觉反馈。
+- 月度次数或连续天数可见。
+- 刷新后数据仍然存在。
+- 空状态、已勾选状态和连续天数反馈都存在。

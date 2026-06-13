@@ -1,56 +1,57 @@
-# Memory Cards Remix Prompts
+# 记忆翻牌：二创任务
 
-## Light Remix
+## 轻改
 
-Prompt:
-
-```text
-Change the Memory Cards symbols to a cooking theme with six pairs. Keep shuffle, moves, match, mismatch, victory, and restart behavior the same.
-```
-
-Expected output:
-
-- New symbols.
-- Same game rules.
-
-Validation:
-
-- 12 cards still render.
-- Matching still works by pair id.
-
-## Medium Remix
-
-Prompt:
+Prompt 1:
 
 ```text
-Add a best-moves record in localStorage. Show the lowest completed move count and update it only when the player wins with fewer moves.
+把记忆翻牌的符号改成厨房主题，仍然使用 6 组配对、共 12 张卡。保留洗牌、步数、匹配、不匹配、胜利和 Restart 行为。
 ```
 
-Expected output:
+预期输出：
 
-- A saved best score.
-- Refresh keeps the best score.
+- 卡牌符号换成厨房主题。
+- 游戏规则保持不变。
 
-Validation:
+验收方式：
 
-- Win once and see best moves.
-- Refresh and confirm it remains.
+- 页面仍然渲染 12 张卡。
+- 匹配仍然根据 pair id 判断。
 
-## Deep Remix
+## 中改
 
-Prompt:
+Prompt 2:
 
 ```text
-Add difficulty levels for 6, 8, and 10 pairs. Keep the board responsive and keep all matching logic in pure functions.
+增加一个 best moves 最佳步数记录，保存到 localStorage。玩家胜利用更少步数完成时才更新最佳步数，并在页面上显示。
 ```
 
-Expected output:
+预期输出：
 
-- Difficulty selector.
-- Dynamic card count.
-- Tests for each pair count.
+- 页面显示最佳步数。
+- 最佳步数会保存。
+- 刷新后仍然能看到记录。
 
-Validation:
+验收方式：
 
-- Each difficulty renders the correct number of cards.
-- Victory works on every difficulty.
+- 完成一局后出现 best moves。
+- 刷新页面后 best moves 不消失。
+
+## 深改
+
+Prompt 3:
+
+```text
+增加 6、8、10 组配对三种难度。棋盘要继续响应式适配，并把卡牌创建和匹配规则保留在纯函数里。
+```
+
+预期输出：
+
+- 有难度选择器。
+- 卡牌数量随难度变化。
+- 每种配对数量都有对应测试。
+
+验收方式：
+
+- 选择每个难度时，卡牌数量正确。
+- 每个难度都可以正常胜利。

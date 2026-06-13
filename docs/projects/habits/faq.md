@@ -1,29 +1,29 @@
-# Habit Grid FAQ
+# 习惯方格：常见问题
 
-## 1. Why is today highlighted on the wrong square?
+## 1. 为什么今天高亮在错误的格子上？
 
-Use one date-key function everywhere and compare keys like `2026-06-13`.
+全项目使用同一个日期 key 函数，例如 `2026-06-13`。比较日期时比较 key，不要比较展示文字。
 
-## 2. Why does a checked date disappear after refresh?
+## 2. 为什么勾选日期刷新后消失？
 
-Make toggle save the updated checked date array and initial state read from the same localStorage key.
+toggle 后要保存更新后的日期 key 数组，初始状态也要从同一个 `localStorage` key 读取。
 
-## 3. Why is the streak wrong when there is a gap?
+## 3. 为什么连续天数遇到断档还继续增加？
 
-Count backward from today and stop as soon as a date is not checked.
+从今天开始往前数，遇到第一个未勾选日期就停止。连续天数不能跨过空缺日期。
 
-## 4. Why does the monthly count include another month?
+## 4. 为什么月度次数算进了别的月份？
 
-Count only dates that are present in the generated current month grid.
+只统计当前月份网格里存在的日期。不要直接数全部存储日期。
 
-## 5. Why do buttons overflow on mobile?
+## 5. 为什么按钮在手机上溢出？
 
-Use a 7-column grid with small gaps and square buttons that can shrink inside the container.
+使用 7 列网格、小间距和能在容器内缩小的方形按钮。
 
-## 6. Why does corrupt storage break the page?
+## 6. 为什么损坏的存储会让页面坏掉？
 
-Wrap JSON parsing in `try/catch` and fall back to an empty array.
+读取 `localStorage` 时用 `try/catch`，解析失败就回退为空数组。
 
-## 7. Why is checked state hard to see?
+## 7. 为什么已勾选状态不明显？
 
-Use more than color when possible: filled background, border, and `aria-pressed`.
+尽量不要只靠颜色。可以同时使用填充、边框和 `aria-pressed`，让视觉和辅助状态都清楚。

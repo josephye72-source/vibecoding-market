@@ -1,70 +1,68 @@
-# Split Console Source Guide
+# 分账控制台：源码导览
 
-## Read These Files First
+## 先看这些文件
 
 1. `src/demos/split/logic.ts`
 
-   This file parses item amounts and participants, validates input, calculates totals, and builds the copyable summary.
+   先读这里。它解析总金额、明细金额和参与者，校验输入，计算总额和人均金额，并生成可复制的摘要。
 
 2. `src/demos/split/render.ts`
 
-   This file renders inputs, listens for changes, updates results, and handles the copy button.
+   这个文件负责渲染输入框、监听输入变化、刷新结果，并处理复制按钮。
 
 3. `src/main.ts`
 
-   This file mounts Split Console on `#/projects/split-console/demo`.
+   这里把 Split Console 挂载到 `/#/projects/split-console/demo`。
 
 4. `src/styles/app.css`
 
-   Search for `.split-demo`. This section owns the blue Split Console motif.
+   搜索 `.split-demo`。这一段控制蓝色控制台面板、结果重点、错误状态和响应式控件。
 
 5. `src/demos/split/logic.test.ts`
 
-   Read this file to understand expected calculations and invalid states.
+   改计算规则前先看测试。它说明有效输入、无效输入、明细金额和复制摘要应该如何工作。
 
-## What Each Core File Does
+## 核心文件做什么
 
-- `logic.ts`: parse, validate, calculate, format, summarize.
-- `render.ts`: DOM inputs, immediate recalculation, copy feedback.
-- `main.ts`: route selection and mount.
-- `app.css`: console layout, result emphasis, responsive controls.
-- `site.spec.ts`: browser proof for valid, invalid, item, and copy flows.
+- `logic.ts`：负责解析、校验、计算、格式化和摘要生成。
+- `render.ts`：负责 DOM 输入、即时重算、复制反馈和按钮状态。
+- `main.ts`：负责路由选择和 demo 挂载。
+- `app.css`：负责控制台布局、数字重点、错误提示和移动端控件。
+- `site.spec.ts`：用浏览器测试证明有效输入、无效输入、明细和复制流程可用。
 
-## Beginner Edit Points
+## 新手可改位置
 
-1. Change currency:
+1. 想改货币显示：
 
-   Edit `formatSplitMoney` in `logic.ts`.
+   修改 `logic.ts` 里的 `formatSplitMoney`。
 
-2. Change validation copy:
+2. 想改校验提示：
 
-   Edit the error strings in `calculateSplit`.
+   修改 `logic.ts` 里 `calculateSplit` 返回的错误字符串。
 
-3. Change summary wording:
+3. 想改复制摘要：
 
-   Edit `copyableSplitSummary` in `logic.ts`.
+   修改 `logic.ts` 里的 `copyableSplitSummary`。
 
-## Build Tool And Running
+保持一个原则：同一个结果对象应该同时驱动可见总额、人均结果、错误提示、摘要文字和复制按钮状态。
 
-This project uses Vite as a lightweight static frontend dev/build tool. For a beginner, Vite is the small helper that opens the app in a local browser, reloads when files change, and packages the plain web files for publishing.
+## 构建工具与运行
 
-Run locally:
+这个项目使用 Vite。它负责启动本地开发网页、监听文件变化，并把 HTML/CSS/TS 打包成静态文件。
+
+本地运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open the local URL and visit `/#/projects/split-console/demo`.
+然后打开本地地址，进入 `/#/projects/split-console/demo`。
 
-Build/check before sharing:
+发布前检查：
 
 ```powershell
 npm run build
 ```
 
-That command type-checks the TypeScript and creates a static `dist/` build.
-
-## Safe Change Rule
-
-One result object should drive the visible total, per-person result, error, summary, and copy button state.
+这个命令会检查 TypeScript，并生成静态 `dist/` 构建。

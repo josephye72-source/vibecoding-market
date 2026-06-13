@@ -1,55 +1,56 @@
-# Split Console Remix Prompts
+# 分账控制台：二创任务
 
-## Light Remix
+## 轻改
 
-Prompt:
-
-```text
-Change Split Console into a pizza split calculator. Keep total/items, participants, immediate result, invalid input, and copy summary behavior.
-```
-
-Expected output:
-
-- Pizza-themed copy.
-- Same calculation.
-
-Validation:
-
-- Enter total and participants.
-- Per-person amount updates.
-
-## Medium Remix
-
-Prompt:
+Prompt 1:
 
 ```text
-Add a tip percentage field. The app should split total plus tip and include the tip percentage in the summary.
+把分账控制台改成披萨分账计算器。保留总额/明细、参与者、即时结果、无效输入提示和复制摘要行为。
 ```
 
-Expected output:
+预期输出：
 
-- Tip input.
-- Adjusted total.
-- Updated summary.
+- 文案变成披萨场景。
+- 分账计算规则保持不变。
 
-Validation:
+验收方式：
 
-- 100 with 20% tip and 3 people gives 40 each.
+- 输入总额和参与者。
+- 人均金额立即更新。
 
-## Deep Remix
+## 中改
 
-Prompt:
+Prompt 2:
 
 ```text
-Add weighted participants so someone can pay 2 shares while others pay 1 share. Show each participant's amount.
+增加一个小费百分比输入框。应用应该先计算总额加小费，再分摊给参与者，并把小费百分比写进摘要。
 ```
 
-Expected output:
+预期输出：
 
-- Participant rows with weights.
-- Per-participant result list.
-- Validation for positive weights.
+- 有小费输入框。
+- 总额会加上小费。
+- 摘要会说明小费比例。
 
-Validation:
+验收方式：
 
-- A 2x participant pays twice the 1x amount.
+- 输入 100、20% 小费、3 个人。
+- 每人结果是 40。
+
+## 深改
+
+Prompt 3:
+
+```text
+增加按权重分账。某个参与者可以是 2 份，其他人是 1 份；页面要显示每个参与者各自需要支付多少。
+```
+
+预期输出：
+
+- 参与者行可以填写权重。
+- 结果区显示每个人的金额。
+- 权重必须是正数，错误时给出提示。
+
+验收方式：
+
+- 一个 2x 参与者支付金额是 1x 参与者的两倍。

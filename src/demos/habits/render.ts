@@ -6,8 +6,10 @@ import {
   toggleHabitDate,
   type HabitState
 } from "./logic";
+import { dictionaries } from "../../i18n/dictionaries";
+import type { Locale } from "../../i18n/types";
 
-const monthNames = [
+const monthNamesEn = [
   "January",
   "February",
   "March",
@@ -22,31 +24,35 @@ const monthNames = [
   "December"
 ];
 
-export function renderHabitDemo(): string {
+const monthNamesZh = ["1 月", "2 月", "3 月", "4 月", "5 月", "6 月", "7 月", "8 月", "9 月", "10 月", "11 月", "12 月"];
+
+export function renderHabitDemo(locale: Locale): string {
+  const copy = dictionaries[locale].demos.habits;
+
   return `
     <section class="habit-demo" data-testid="habit-demo" aria-labelledby="habit-title">
       <div class="demo-intro">
-        <p class="project-detail__motif">Growth Grid / Habit Grid</p>
-        <h1 id="habit-title">Habit Grid</h1>
-        <p class="project-detail__lede">Tap a date, turn it green, and let the month count show momentum.</p>
+        <p class="project-detail__motif">${locale === "zh" ? "Growth Grid / 生长网格" : "Growth Grid / Habit Grid"}</p>
+        <h1 id="habit-title">${copy.title}</h1>
+        <p class="project-detail__lede">${copy.lede}</p>
       </div>
       <div class="habit-shell">
         <div class="habit-summary">
           <p data-habit-month></p>
           <dl>
-            <div><dt>This month</dt><dd data-testid="habit-monthly-count">0</dd></div>
-            <div><dt>Current streak</dt><dd data-testid="habit-streak">0</dd></div>
+            <div><dt>${copy.thisMonth}</dt><dd data-testid="habit-monthly-count">0</dd></div>
+            <div><dt>${copy.currentStreak}</dt><dd data-testid="habit-streak">0</dd></div>
           </dl>
           <p class="habit-feedback" data-testid="habit-feedback" role="status" aria-live="polite"></p>
           <p class="habit-storage-status" data-habit-storage-status role="status" aria-live="polite"></p>
         </div>
-        <div class="habit-grid" data-habit-grid aria-label="Habit calendar"></div>
+        <div class="habit-grid" data-habit-grid aria-label="${copy.calendarLabel}"></div>
       </div>
     </section>
   `;
 }
 
-export function mountHabitDemo(): () => void {
+export function mountHabitDemo(locale: Locale): () => void {
   const root = document.querySelector<HTMLElement>("[data-testid='habit-demo']");
 
   if (!root) {
@@ -59,11 +65,13 @@ export function mountHabitDemo(): () => void {
   const streak = root.querySelector<HTMLElement>("[data-testid='habit-streak']");
   const feedback = root.querySelector<HTMLElement>("[data-testid='habit-feedback']");
   const storageStatus = root.querySelector<HTMLElement>("[data-habit-storage-status]");
+  const copy = dictionaries[locale].demos.habits;
   let state: HabitState = createHabitState();
 
   function paint(): void {
     if (month) {
-      month.textContent = `${monthNames[state.monthIndex]} ${state.year}`;
+      const monthName = locale === "zh" ? monthNamesZh[state.monthIndex] : monthNamesEn[state.monthIndex];
+      month.textContent = locale === "zh" ? `${state.year} 年 ${monthName}` : `${monthName} ${state.year}`;
     }
 
     if (count) {
@@ -75,12 +83,17 @@ export function mountHabitDemo(): () => void {
     }
 
     if (feedback) {
-      feedback.textContent = getHabitFeedback(state).message;
-      feedback.dataset.state = getHabitFeedback(state).state;
+      const habitFeedback = getHabitFeedback(state);
+      feedback.textContent =
+        habitFeedback.state === "streak"
+          ? copy.feedback.streak.replace("{count}", String(calculateHabitStreak(state)))
+          : copy.feedback[habitFeedback.state];
+      feedback.dataset.state = habitFeedback.state;
     }
 
     if (storageStatus) {
-      storageStatus.textContent = state.message;
+      storageStatus.textContent =
+        state.storageStatus === "idle" ? "" : copy.storageStatus[state.storageStatus];
       storageStatus.dataset.state = state.storageStatus;
     }
 
@@ -97,7 +110,7 @@ export function mountHabitDemo(): () => void {
             data-testid="habit-day"
             data-habit-date="${day.date}"
             aria-pressed="${day.status === "checked" ? "true" : "false"}"
-            aria-label="${day.date}${day.status === "checked" ? " checked" : ""}"
+            aria-label="${day.date}${day.status === "checked" ? ` ${copy.checked}` : ""}"
           >
             <span>${day.dayNumber}</span>
           </button>

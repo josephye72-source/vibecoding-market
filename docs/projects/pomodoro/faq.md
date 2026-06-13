@@ -1,29 +1,29 @@
-# Focus Pomodoro FAQ
+# 专注番茄钟：常见问题
 
-## 1. Why does the timer keep running after Pause?
+## 1. 为什么按 Pause 后计时还在走？
 
-The interval was probably not cleared. Pause should call the logic function that changes status to `paused`, then clear the browser interval.
+通常是 interval 没有清理。Pause 应该先调用逻辑函数把状态改成 `paused`，再清掉浏览器里的 interval。
 
-## 2. Why does the completed count disappear after refresh?
+## 2. 为什么刷新后今天完成次数没了？
 
-Check that completion writes to `localStorage` and initial state reads from the same key. Also check that the saved date matches today's date.
+检查完成时是否写入了 `localStorage`，初始状态是否从同一个 key 读取。还要确认保存的日期就是今天。
 
-## 3. Why does corrupt localStorage crash the page?
+## 3. 为什么损坏的 localStorage 会让页面崩掉？
 
-Wrap JSON parsing in a `try/catch` and return `{ date: today, completed: 0 }` when parsing fails.
+解析 JSON 时包一层 `try/catch`。解析失败时返回 `{ date: today, completed: 0 }`，不要让错误冒到页面上。
 
-## 4. Why does progress move in the wrong direction?
+## 4. 为什么进度条方向反了？
 
-Use elapsed progress: `(totalSeconds - remainingSeconds) / totalSeconds`. The countdown should go down, but the progress feedback should fill up.
+进度应该表示已经过去的比例：`(totalSeconds - remainingSeconds) / totalSeconds`。倒计时数字往下走，进度反馈应该往上填满。
 
-## 5. Why does Start create two timers?
+## 5. 为什么连续点 Start 会出现两个计时器？
 
-Starting twice can create duplicate intervals if the renderer does not clear the old interval first. Keep one interval id and clear it before starting a new one.
+如果渲染层没有先清掉旧 interval，就会创建重复计时器。保留一个 interval id，每次 Start 前先清理旧的。
 
-## 6. Why does Break completion increase the focus count?
+## 6. 为什么休息模式完成后也增加了专注次数？
 
-Only focus sessions should increment today's completed count. Break mode can show completion feedback without changing the record.
+只有 `focus` 模式完成时才应该增加今天的专注次数。`break` 模式可以显示完成反馈，但不改计数。
 
-## 7. Why is the timer hard to use on mobile?
+## 7. 为什么手机上不好点？
 
-Check that buttons are at least 44px tall, the layout becomes one column on narrow screens, and the countdown text does not overflow the dial.
+检查按钮高度是否至少 44px，小屏布局是否变成单列，倒计时文字是否溢出圆形计时盘。

@@ -1,29 +1,29 @@
-# Split Console FAQ
+# 分账控制台：常见问题
 
-## 1. Why does the result show NaN?
+## 1. 为什么结果显示 NaN？
 
-Validate inputs before dividing and show `--` when the result is invalid.
+除法前先校验总额、明细和参与者。结果无效时显示 `--` 和错误提示，不要把 `NaN` 展示给用户。
 
-## 2. Why does people count become 0?
+## 2. 为什么参与人数会变成 0？
 
-Require at least one participant or a positive people count before calculating.
+计算前要求至少有一个参与者，或者人数是正数。人数为 0 时应该进入错误状态。
 
-## 3. Why do item amounts not add up?
+## 3. 为什么明细金额加不对？
 
-Parse commas, spaces, and new lines, then sum only positive finite numbers.
+解析时同时支持逗号、空格和换行，只把正的有限数字加入求和。
 
-## 4. Why does changing inputs not update the result?
+## 4. 为什么改输入后结果没有更新？
 
-Listen for `input` events and recalculate from the current fields every time.
+监听 `input` 事件，每次字段变化都从当前表单重新计算，不要等提交按钮。
 
-## 5. Why is the copied text stale?
+## 5. 为什么复制出来的是旧文本？
 
-Build the copy text from the same current result object used by the UI.
+复制摘要要从当前结果对象生成，和页面上正在显示的总额、人均金额保持一致。
 
-## 6. Why is invalid input still copyable?
+## 6. 为什么无效输入时还能复制？
 
-Disable the copy button when the result is invalid.
+当结果无效时禁用复制按钮。只有存在有效总额、有效参与者和有效摘要时，才允许复制。
 
-## 7. Why is the tool slow to complete?
+## 7. 为什么这个工具完成一次分账很慢？
 
-Keep the flow to three fields: total or items, participants, and copy summary.
+保持流程只需要三类输入：总额或明细、参与者、复制摘要。不要在 V1 里加入账号、支付或复杂历史记录。

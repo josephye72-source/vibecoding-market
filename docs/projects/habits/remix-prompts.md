@@ -1,57 +1,57 @@
-# Habit Grid Remix Prompts
+# 习惯方格：二创任务
 
-## Light Remix
+## 轻改
 
-Prompt:
-
-```text
-Change Habit Grid into a water-drinking tracker. Keep the same date toggles, monthly count, streak feedback, and localStorage persistence.
-```
-
-Expected output:
-
-- Water-specific copy.
-- Same grid behavior.
-
-Validation:
-
-- Check a date.
-- Refresh preserves it.
-
-## Medium Remix
-
-Prompt:
+Prompt 1:
 
 ```text
-Add optional notes for checked dates. A date can be checked without a note, but a note should persist when added.
+把习惯方格改成喝水记录器。保留日期切换、月度次数、连续天数反馈和 localStorage 持久化。
 ```
 
-Expected output:
+预期输出：
 
-- Note input or small editor.
-- Data shape stores notes by date.
+- 文案变成喝水场景。
+- 日期方格的行为保持不变。
 
-Validation:
+验收方式：
 
-- Add a note.
-- Refresh and see it again.
+- 勾选某一天。
+- 刷新后勾选状态仍然保留。
 
-## Deep Remix
+## 中改
 
-Prompt:
+Prompt 2:
 
 ```text
-Support multiple habits by storing checked dates under habit names and adding a selector to switch the active habit.
+给已勾选日期增加可选备注。日期可以没有备注也保持勾选；如果填写备注，备注需要刷新后仍然存在。
 ```
 
-Expected output:
+预期输出：
 
-- Habit selector.
-- Separate data per habit.
-- Same count and streak calculations for the active habit.
+- 有备注输入或小编辑器。
+- 数据结构可以按日期保存备注。
 
-Validation:
+验收方式：
 
-- Check a date for habit A.
-- Switch to habit B.
-- Habit B starts empty.
+- 给一个日期添加备注。
+- 刷新后还能看到备注。
+
+## 深改
+
+Prompt 3:
+
+```text
+支持多个习惯。按习惯名称分别保存已勾选日期，并增加一个选择器切换当前习惯。
+```
+
+预期输出：
+
+- 有习惯选择器。
+- 每个习惯有独立数据。
+- 当前习惯继续使用同一套月度次数和连续天数计算。
+
+验收方式：
+
+- 在习惯 A 勾选一天。
+- 切换到习惯 B。
+- 习惯 B 一开始没有习惯 A 的勾选状态。

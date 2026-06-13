@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { projects } from "../../src/data/projects";
+import { sourceEntriesByProject } from "../../src/data/sourceEntries";
 
 type ProjectLinks = {
   demo?: string;
@@ -37,6 +38,12 @@ function primaryRoutePaths(): string[] {
       `/#/projects/${project.slug}/demo`
     ])
   ];
+}
+
+async function useEnglishLocale(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("vcm:locale", "en");
+  });
 }
 
 async function expectMinimumTouchTarget(locator: Locator): Promise<void> {
@@ -131,6 +138,8 @@ async function expectKeyboardFocusReachable(
 }
 
 async function prepareDemoRoute(page: Page, slug: string): Promise<void> {
+  await useEnglishLocale(page);
+
   if (slug === "focus-pomodoro") {
     await page.addInitScript(() => {
       window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
@@ -246,13 +255,32 @@ test("homepage first viewport renders site value, primary paths, tags, and cards
   await expect(page.getByTestId("project-card")).toHaveCount(5);
 });
 
-test("homepage renders a four-step beginner path", async ({ page }) => {
+test("homepage hero presents the long-term project-map identity", async ({ page }) => {
   await page.goto("/");
+  const hero = page.locator(".hero");
 
-  await expect(page.getByTestId("beginner-path").locator("li")).toHaveCount(4);
+  await expect(hero).toContainText("公开");
+  await expect(hero).toContainText("公益");
+  await expect(hero).toContainText("可复现");
+  await expect(hero).toContainText("项目地图");
+  await expect(hero).not.toContainText("5 个纯 Web 小项目，带你用 Codex 从 0 做到可发布");
 });
 
-test("homepage feedback entry uses a concrete channel and asks the four V1 questions", async ({
+test("homepage separates long-term identity from the V1 first batch", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("heading", { name: /V1 首批项目|当前首批项目/ })).toBeVisible();
+  await expect(page.getByTestId("beginner-path")).toContainText("看源码");
+  await expect(page.getByTestId("project-map-intent")).toContainText("后续");
+});
+
+test("homepage renders a five-step beginner path", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByTestId("beginner-path").locator("li")).toHaveCount(5);
+});
+
+test("homepage feedback entry is present but not bound to X while strategy is pending", async ({
   page
 }) => {
   await page.goto("/");
@@ -263,11 +291,77 @@ test("homepage feedback entry uses a concrete channel and asks the four V1 quest
   await expect(feedback).toContainText("是否愿意复现");
   await expect(feedback).toContainText("卡住位置");
   await expect(feedback).toContainText("二创想法");
-  await expect(feedback.getByRole("link", { name: /发布话题反馈/i })).toHaveAttribute(
-    "href",
-    /^https:\/\/x\.com\/intent\/post/
-  );
+  await expect(feedback).toContainText("反馈方式准备中");
+  await expect(feedback.locator('a[href*="x.com/intent/post"]')).toHaveCount(0);
   await expect(feedback.locator('a[href="https://github.com/"]')).toHaveCount(0);
+});
+
+test("default locale is Chinese and language switch persists", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator("html")).toHaveAttribute("lang", "zh-CN");
+  await expect(page.getByTestId("project-card").first()).toContainText("专注番茄钟");
+
+  await page.getByRole("button", { name: /English/ }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByTestId("project-card").first()).toContainText("Focus Pomodoro");
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+});
+
+test("memory demo is Chinese by default and English after switching", async ({ page }) => {
+  await page.goto("/#/projects/memory-cards/demo");
+
+  await expect(page.getByText("步数")).toBeVisible();
+  await expect(page.getByRole("button", { name: "重新开始" })).toBeVisible();
+  await expect(page.getByText("Moves")).toHaveCount(0);
+
+  await page.getByRole("button", { name: /English/ }).click();
+  await expect(page.getByText("Moves")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Restart game" })).toBeVisible();
+});
+
+test("English detail page does not reuse Chinese project body copy", async ({ page }) => {
+  await page.goto("/#/projects/focus-pomodoro");
+
+  await page.getByRole("button", { name: /English/ }).click();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.getByRole("heading", { name: "Focus Pomodoro" })).toBeVisible();
+
+  const mainText = await page.locator("main").innerText();
+  expect(mainText).not.toMatch(/[\u3400-\u9fff]/);
+});
+
+test("default Chinese locale localizes ledger and habit dynamic demo copy", async ({ page }) => {
+  await page.goto("/#/projects/tiny-ledger/demo");
+
+  await expect(page.getByLabel("分类")).toContainText("工作");
+  await expect(page.getByText("Work")).toHaveCount(0);
+  await page.getByLabel("金额").fill("42");
+  await page.getByLabel("备注").fill("中文验收");
+  await page.getByRole("button", { name: /^添加记录$/ }).click();
+  await expect(page.locator("[data-ledger-storage-status]")).toContainText("已保存");
+  await expect(page.locator("[data-ledger-storage-status]")).not.toContainText("Record");
+
+  await page.clock.setFixedTime(new Date("2026-06-13T12:00:00"));
+  await page.goto("/#/projects/habit-grid/demo");
+  await page.getByRole("button", { name: /^2026-06-13/ }).click();
+  await expect(page.locator("[data-habit-storage-status]")).toContainText("已保存");
+  await expect(page.locator("[data-habit-storage-status]")).not.toContainText("Check-in");
+});
+
+test("default Chinese locale localizes key accessibility labels", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.locator('nav[aria-label="主导航"]')).toHaveCount(1);
+  await expect(page.locator('[aria-label="Primary navigation"]')).toHaveCount(0);
+  await expect(page.locator('[aria-label="站点定位"]')).toHaveCount(1);
+
+  await page.goto("/#/projects/focus-pomodoro/demo");
+  await expect(page.locator('[aria-label="番茄钟控制"]')).toHaveCount(1);
+  await expect(page.locator('[aria-label="Pomodoro controls"]')).toHaveCount(0);
+  await expect(page.locator('[aria-label="计时进度"]')).toHaveCount(1);
 });
 
 for (const viewport of homepageViewports) {
@@ -291,6 +385,7 @@ for (const project of projects) {
     page
   }) => {
     const links = linksFor(project);
+    await useEnglishLocale(page);
     await page.goto("/");
 
     const card = page.getByTestId("project-card").filter({
@@ -311,6 +406,7 @@ for (const project of projects) {
   test(`detail page for ${project.title} renders the 9 required sections`, async ({
     page
   }) => {
+    await useEnglishLocale(page);
     await page.goto(`/#/projects/${project.slug}`);
 
     await expect(page.getByRole("heading", { name: project.title })).toBeVisible();
@@ -323,6 +419,7 @@ for (const project of projects) {
   for (const viewport of routeViewports) {
     test(`detail page for ${project.title} is responsive at ${viewport.label}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await useEnglishLocale(page);
       await page.goto(`/#/projects/${project.slug}`);
 
       await expect(page.getByRole("heading", { name: project.title })).toBeVisible();
@@ -354,6 +451,7 @@ for (const project of projects) {
 }
 
 test("project documentation links resolve from the static app", async ({ page }) => {
+  await useEnglishLocale(page);
   await page.goto("/#/projects/memory-cards");
 
   const docLink = page.getByRole("link", { name: "Source Guide" });
@@ -361,7 +459,26 @@ test("project documentation links resolve from the static app", async ({ page })
 
   const response = await page.request.get("/docs/projects/memory/source-guide.md");
   expect(response.ok()).toBe(true);
-  expect(await response.text()).toContain("Memory Cards Source Guide");
+  const sourceGuide = await response.text();
+  expect(sourceGuide).toContain("记忆翻牌：源码导览");
+  expect(sourceGuide).not.toContain("Memory Cards Source Guide");
+});
+
+test("project source entries resolve from the static app", async ({ page }) => {
+  for (const project of projects) {
+    const sourceEntry = sourceEntriesByProject[project.slug];
+
+    expect(sourceEntry).toBeDefined();
+    const response = await page.request.get(sourceEntry.indexHref);
+
+    expect(response.ok()).toBe(true);
+    const body = await response.text();
+    expect(body).toContain(`# ${project.slug} source entry`);
+
+    for (const sourceFile of sourceEntry.files) {
+      expect(body).toContain(`## ${sourceFile.repoPath}`);
+    }
+  }
 });
 
 test("project documentation middleware rejects malformed and directory requests", async ({
@@ -372,9 +489,16 @@ test("project documentation middleware rejects malformed and directory requests"
 
   const directoryResponse = await page.request.get("/docs/projects/memory");
   expect(directoryResponse.status()).toBe(404);
+
+  const malformedSourceResponse = await page.request.get("/source/%E0%A4%A");
+  expect(malformedSourceResponse.status()).toBe(400);
+
+  const extraSourcePathResponse = await page.request.get("/source/memory-cards/index.txt/extra");
+  expect(extraSourcePathResponse.status()).toBe(404);
 });
 
 test("focus pomodoro demo supports the closed-loop timer path", async ({ page }) => {
+  await useEnglishLocale(page);
   await page.addInitScript(() => {
     window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
   });
@@ -418,6 +542,7 @@ test("focus pomodoro demo supports the closed-loop timer path", async ({ page })
 test("memory cards demo supports matching, mismatch feedback, victory, and restart", async ({
   page
 }) => {
+  await useEnglishLocale(page);
   await page.addInitScript(() => {
     window.__VCM_MEMORY_TEST_ORDER__ = ["01", "10", "01", "</>", "10", "</>", "{}", "=>", "{}", "[]", "=>", "[]"];
   });
@@ -460,6 +585,7 @@ test("memory cards demo supports matching, mismatch feedback, victory, and resta
 });
 
 test("memory cards demo safely renders symbol-like card text", async ({ page }) => {
+  await useEnglishLocale(page);
   await page.addInitScript(() => {
     window.__VCM_MEMORY_TEST_ORDER__ = ["01", "10", "01", "</>", "10", "</>", "{}", "=>", "{}", "[]", "=>", "[]"];
   });
@@ -474,6 +600,7 @@ test("memory cards demo safely renders symbol-like card text", async ({ page }) 
 test("tiny ledger demo adds, deletes, totals, persists, and shows empty state", async ({
   page
 }) => {
+  await useEnglishLocale(page);
   await page.goto("/#/projects/tiny-ledger/demo");
 
   await expect(page.getByRole("heading", { name: /Tiny Ledger/i })).toBeVisible();
@@ -520,6 +647,7 @@ test("tiny ledger demo adds, deletes, totals, persists, and shows empty state", 
 test("habit grid demo toggles a date, shows stats, and persists after refresh", async ({
   page
 }) => {
+  await useEnglishLocale(page);
   await page.clock.setFixedTime(new Date("2026-06-13T12:00:00"));
   await page.goto("/#/projects/habit-grid/demo");
 
@@ -540,13 +668,14 @@ test("habit grid demo toggles a date, shows stats, and persists after refresh", 
 test("split console demo calculates immediately, blocks invalid input, and copies summary", async ({
   page
 }) => {
+  await useEnglishLocale(page);
   await page.addInitScript(() => {
     window.__VCM_CLIPBOARD_WRITE__ = () => Promise.resolve();
   });
   await page.goto("/#/projects/split-console/demo");
 
   await expect(page.getByRole("heading", { name: /Split Console/i })).toBeVisible();
-  await expect(page.getByText(/Split Console \/ /i)).toBeVisible();
+  await expect(page.locator(".project-detail__motif")).toContainText("Split Console");
 
   await page.getByLabel("Total").fill("120");
   await page.getByLabel("Participants").fill("Ava, Bo, Cy");
@@ -573,6 +702,7 @@ test("split console demo calculates immediately, blocks invalid input, and copie
 test("split console copy action has a distinct disabled affordance before valid input", async ({
   page
 }) => {
+  await useEnglishLocale(page);
   await page.goto("/#/projects/split-console/demo");
 
   const copy = page.getByRole("button", { name: /Copy summary/i });
@@ -617,6 +747,7 @@ test("split console copy action has a distinct disabled affordance before valid 
 });
 
 test("split console reports when clipboard copy is unavailable", async ({ page }) => {
+  await useEnglishLocale(page);
   await page.addInitScript(() => {
     window.__VCM_CLIPBOARD_WRITE__ = () => Promise.reject(new Error("blocked"));
   });
@@ -647,6 +778,7 @@ test("malformed and unknown section anchors do not break project rendering", asy
     "/#/projects/focus-pomodoro?section=]",
     "/#/projects/focus-pomodoro?section=missing-section"
   ]) {
+    await useEnglishLocale(page);
     await page.goto(hash);
     await expect(page.getByRole("heading", { name: "Focus Pomodoro" })).toBeVisible();
   }

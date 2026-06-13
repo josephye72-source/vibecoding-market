@@ -1,57 +1,58 @@
-# Tiny Ledger Remix Prompts
+# 账本小记：二创任务
 
-## Light Remix
+## 轻改
 
-Prompt:
-
-```text
-Change Tiny Ledger into a coffee budget tracker with categories Beans, Snacks, Gear, and Tips. Keep add, delete, stats, and localStorage behavior.
-```
-
-Expected output:
-
-- Coffee-specific categories.
-- Same ledger loop.
-
-Validation:
-
-- Add one record in each category.
-- Stats update.
-
-## Medium Remix
-
-Prompt:
+Prompt 1:
 
 ```text
-Add a category filter that changes which rows are visible but keeps income, expense, and balance based on all records.
+把账本小记改成咖啡预算记录器，分类改为 Beans、Snacks、Gear 和 Tips。保留添加、删除、统计和 localStorage 保存行为。
 ```
 
-Expected output:
+预期输出：
 
-- Filter control.
-- List changes by category.
-- Stats do not change when filtering.
+- 分类变成咖啡场景。
+- 账本添加、删除和统计流程不变。
 
-Validation:
+验收方式：
 
-- Add records in two categories.
-- Filter one category.
-- Stats remain based on all records.
+- 每个分类都能新增记录。
+- 收入、支出和余额会更新。
 
-## Deep Remix
+## 中改
 
-Prompt:
+Prompt 2:
 
 ```text
-Add monthly summaries by grouping records by their date month. Show monthly income, expense, and balance above each group.
+增加一个分类筛选器。筛选器只改变记录列表中显示哪些行，收入、支出和余额仍然基于全部记录计算。
 ```
 
-Expected output:
+预期输出：
 
-- Grouped record sections.
-- Derived monthly stats.
+- 页面上有分类筛选控件。
+- 记录列表会按分类变化。
+- 筛选时统计数字不变。
 
-Validation:
+验收方式：
 
-- Add records in two months.
-- Both month groups appear with correct subtotals.
+- 添加两个不同分类的记录。
+- 只筛选其中一个分类。
+- 统计仍然按全部记录计算。
+
+## 深改
+
+Prompt 3:
+
+```text
+按记录日期增加月度分组。在每个月份分组上方显示该月收入、支出和余额。
+```
+
+预期输出：
+
+- 记录按月份分组展示。
+- 每个分组有自己的月度统计。
+
+验收方式：
+
+- 添加两个不同月份的记录。
+- 页面出现两个月份分组。
+- 每个分组的小计正确。

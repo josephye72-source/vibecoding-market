@@ -1,220 +1,228 @@
-# Memory Cards: Codex From Zero
+# 记忆翻牌：Codex 从 0 到 1
 
-## Project Goal
+## 项目目标
 
-Build a pure web memory matching game with 12 cards, 6 pairs, shuffled order, flip feedback, match and mismatch states, move count, victory feedback, restart, and mouse/touch friendly controls.
+做一个纯 Web 记忆配对游戏：12 张卡、6 组配对、每局洗牌、翻牌反馈、匹配和不匹配状态、步数统计、胜利反馈、Restart，并且鼠标和触屏都好用。
 
-## Preparation
+## 准备
 
-- Start from an empty folder.
-- Use plain HTML, CSS, and TypeScript or JavaScript.
-- Do not add a backend, login, database, API, upload, leaderboard, or comments.
-- Keep game rules in pure functions and DOM code in a separate renderer.
+- 从一个空文件夹开始。
+- 使用普通的 HTML、CSS 和 TypeScript，也可以先用 JavaScript。
+- 不要添加后端、登录、数据库、API、上传、排行榜或评论。
+- 游戏规则放在纯函数里，DOM 代码放在独立渲染器里。
 
-## From An Empty Folder
+## 从空文件夹开始
 
-Create these files first:
+先创建这些文件：
 
-- `index.html`: app root.
-- `src/main.ts`: imports the renderer and starts the app.
-- `src/demos/memory/logic.ts`: cards, shuffle, flip, match, mismatch, restart.
-- `src/demos/memory/render.ts`: game board markup and event listeners.
-- `src/styles/app.css`: Neon Arcade Lab styling.
+- `index.html`：页面入口和 app 挂载点。
+- `src/main.ts`：导入渲染器并启动应用。
+- `src/demos/memory/logic.ts`：创建卡牌、洗牌、翻牌、匹配、不匹配和 Restart。
+- `src/demos/memory/render.ts`：棋盘 HTML 和事件监听。
+- `src/styles/app.css`：Neon Arcade Lab 视觉。
 
-## Starting Prompt
+## 起步 Prompt
 
 Prompt:
 
 ```text
-Create a pure HTML/CSS/TypeScript memory card game from an empty folder. It must have 12 cards made from 6 pairs, shuffle each new game, flip two cards, show match and mismatch feedback, count moves, show victory feedback when all pairs are matched, and provide a restart button. Keep the game logic in pure functions and keep the UI beginner-readable.
+从空文件夹创建一个纯 HTML/CSS/TypeScript 记忆翻牌游戏。它必须有 12 张卡，由 6 组配对组成；每局开始时洗牌；玩家每次翻两张卡；显示匹配和不匹配反馈；统计步数；全部配对后显示胜利反馈；提供 Restart 按钮。请把游戏规则放在纯函数里，让 UI 对新手容易读懂。
 ```
 
-Expected output:
+预期输出：
 
-- A runnable static web app.
-- A 12-card board.
-- Separate logic and rendering files.
-- No backend or account code.
+- 一个能运行的静态 Web 应用。
+- 一个 12 张卡的棋盘。
+- 逻辑文件和渲染文件分开。
+- 没有后端或账号代码。
 
-Validation:
+验收方式：
 
-- Open the page and see the goal, board, moves, and restart within 10 seconds.
-- Flip two matching cards and see match feedback.
-- Flip two nonmatching cards and see mismatch feedback.
-- Finish all pairs and see victory feedback.
+- 10 秒内能看到目标、棋盘、步数和 Restart。
+- 翻到匹配卡时出现匹配反馈。
+- 翻到不匹配卡时出现不匹配反馈。
+- 完成所有配对后出现胜利反馈。
 
-## Improvement Prompts
+## 改进 Prompt
 
 Prompt 1:
 
 ```text
-Add a Neon Arcade Lab visual motif with purple and pink card glow, pressed card states, and a compact moves/status panel. Keep all cards touch-friendly.
+加入 Neon Arcade Lab 视觉：紫色和粉色卡牌发光、按下状态、紧凑的步数和状态面板。所有卡牌都要适合触屏点击。
 ```
 
-Expected output:
+预期输出：
 
-- Neon arcade colors.
-- Face-down, face-up, matched, and mismatch states are visually distinct.
-- Cards remain usable on mobile.
+- 有霓虹街机色彩。
+- 背面、翻开、已匹配和不匹配状态视觉不同。
+- 手机上也能轻松点卡。
 
-Validation:
+验收方式：
 
-- Tap cards on a 390px wide viewport.
-- Matched cards stay visible.
-- Mismatch feedback appears immediately.
+- 在 390px 宽度下点击卡牌。
+- 已匹配卡牌保持可见。
+- 不匹配反馈立即出现。
 
 Prompt 2:
 
 ```text
-Make restart create a fresh shuffled board and reset moves to 0 without reloading the page.
+让 Restart 不刷新页面也能创建一局新的洗牌棋盘，并把步数重置为 0。
 ```
 
-Expected output:
+预期输出：
 
-- Restart button calls the same game creation logic.
-- Moves reset to 0.
-- Card order changes.
+- Restart 调用同一套新游戏创建逻辑。
+- moves 回到 0。
+- 卡牌顺序发生变化。
 
-Validation:
+验收方式：
 
-- Record the first board order.
-- Click Restart.
-- Confirm moves are 0 and order is different.
+- 记录第一局的卡牌顺序。
+- 点击 Restart。
+- 确认步数为 0，顺序和之前不同。
 
 Prompt 3:
 
 ```text
-Lock the board while mismatched cards are visible so the player cannot flip a third card during the feedback delay.
+不匹配的两张卡可见时锁住棋盘，避免玩家在反馈延迟期间翻开第三张卡。
 ```
 
-Expected output:
+预期输出：
 
-- Two mismatched cards stay open briefly.
-- Other cards are temporarily disabled.
-- Cards close after the delay.
+- 两张不匹配卡短暂停留。
+- 其他卡牌临时不可点。
+- 延迟结束后不匹配卡翻回去。
 
-Validation:
+验收方式：
 
-- Flip a mismatch.
-- Try clicking a third card immediately.
-- The third card does not open until feedback clears.
+- 翻开一组不匹配卡。
+- 立刻尝试点击第三张。
+- 第三张不会在反馈结束前翻开。
 
-## Troubleshooting Prompts
+## 排错 Prompt
 
 Prompt 1:
 
 ```text
-The same card can be clicked twice and counts as a match. Add a guard that ignores already open or matched cards.
+同一张卡可以点两次并被算作匹配。请增加保护逻辑，忽略已经翻开或已经匹配的卡牌。
 ```
 
-Expected output:
+预期输出：
 
-- Clicking an open card does nothing.
-- Move count only changes after two different cards are selected.
+- 点击已翻开的卡不会产生变化。
+- 只有两张不同卡被选择后才增加步数。
 
-Validation:
+验收方式：
 
-- Click one card twice.
-- Moves stay at 0.
+- 连续点击同一张卡两次。
+- moves 仍然是 0。
 
 Prompt 2:
 
 ```text
-The board order is identical every game. Inspect the shuffle function and make sure restart creates a new shuffled copy instead of reusing the old array.
+每局棋盘顺序都一样。请检查 shuffle 函数，确保 Restart 创建新的洗牌副本，而不是复用旧数组。
 ```
 
-Expected output:
+预期输出：
 
-- Shuffle returns a new card array.
-- Restart does not mutate stale state.
+- shuffle 返回新的卡牌数组。
+- Restart 不会修改旧状态后继续复用。
 
-Validation:
+验收方式：
 
-- Restart several times.
-- Card order changes.
+- 连续 Restart 几次。
+- 卡牌顺序会变化。
 
 Prompt 3:
 
 ```text
-Victory appears too early. Check the win condition and only show victory when every card is marked matched.
+胜利提示出现得太早。请检查胜利条件，只有每张卡都标记为 matched 时才显示胜利。
 ```
 
-Expected output:
+预期输出：
 
-- Match feedback appears for normal pairs.
-- Victory appears only after the last pair.
+- 普通配对时只显示匹配反馈。
+- 最后一组配对完成后才显示胜利。
 
-Validation:
+验收方式：
 
-- Match one pair on a 12-card board.
-- Victory is not shown.
-- Match all pairs and victory is shown.
+- 在 12 张卡里只配对一组。
+- 不显示胜利。
+- 配完全部卡后显示胜利。
 
-## Remix Prompts
+## 二创 Prompt
 
 Prompt 1:
 
 ```text
-Remix this game into a color matching board. Replace text symbols with color swatches and keep the same match rules.
+把这个游戏二创成颜色配对板。用色块替换文字符号，但保留相同的 pair id 匹配规则。
 ```
 
-Expected output:
+预期输出：
 
-- Cards show colors when face-up.
-- Matching is still based on pair id.
+- 卡牌翻开后显示颜色。
+- 匹配仍然按 pair id 判断。
 
-Validation:
+验收方式：
 
-- Matching colors stay open.
-- Nonmatching colors close.
+- 相同颜色会保持打开。
+- 不同颜色会翻回去。
 
 Prompt 2:
 
 ```text
-Add a timer that starts on the first flip and shows how long the player took to win.
+增加一个计时器：第一次翻牌时开始计时，胜利时停止，并显示玩家完成用了多久。
 ```
 
-Expected output:
+预期输出：
 
-- Timer starts after the first card.
-- Timer stops on victory.
-- Restart clears the timer.
+- 第一次翻牌后计时开始。
+- 胜利时计时停止。
+- Restart 会清空计时。
 
-Validation:
+验收方式：
 
-- First flip starts the timer.
-- Victory freezes the final time.
+- 第一次翻牌启动计时。
+- 胜利后最终用时不再变化。
 
 Prompt 3:
 
 ```text
-Add difficulty levels for 6, 8, and 10 pairs while keeping the card creation and shuffle logic testable.
+增加 6、8、10 组配对三种难度，并保持卡牌创建和洗牌逻辑可测试。
 ```
 
-Expected output:
+预期输出：
 
-- A difficulty selector.
-- Board size changes based on pair count.
-- Logic still creates pairs from a symbol list.
+- 有难度选择器。
+- 棋盘大小按配对数量变化。
+- 逻辑仍然从符号列表创建配对。
 
-Validation:
+验收方式：
 
-- Select each difficulty.
-- Card count is twice the pair count.
+- 分别选择每个难度。
+- 卡牌数量等于配对数量的两倍。
 
-## Running The Project
+## 运行项目
+
+在这个仓库里运行：
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Then open `/#/projects/memory-cards/demo`.
+然后打开 `/#/projects/memory-cards/demo`。
 
-## Validation Checklist
+发布前可以检查一次构建：
 
-- 12 cards and 6 pairs are present.
-- Each game shuffles.
-- Flip, match, mismatch, moves, victory, and restart work.
-- Mouse and touch can operate cards.
-- No backend, login, database, API, upload, leaderboard, or comments are added.
+```powershell
+npm run build
+```
+
+## 验收清单
+
+- 页面有 12 张卡和 6 组配对。
+- 每局都会洗牌。
+- 翻牌、匹配、不匹配、步数、胜利和 Restart 都可用。
+- 鼠标和触屏都能操作卡牌。
+- 没有新增后端、登录、数据库、API、上传、排行榜或评论。

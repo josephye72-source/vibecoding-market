@@ -1,41 +1,47 @@
-# Split Console Complexity Map
+# 分账控制台：复杂度拆解
 
-## Page Structure
+## 页面结构
 
-The demo has three zones:
+demo 有三块区域：
 
-- Intro: what to enter.
-- Inputs: total, item amounts, participants.
-- Result: error, total, per-person result, summary, copy.
+- 介绍区：说明要输入什么。
+- 输入区：总金额、明细金额和参与者。
+- 结果区：错误提示、总额、人均金额、摘要和复制按钮。
 
-## Interaction
+页面要让用户在一分钟内完成一次分账，所以字段必须少而清楚。
 
-The user can:
+## 交互
 
-- Enter a direct total.
-- Enter item amounts instead.
-- Enter participant names.
-- See results update immediately.
-- Copy the summary.
+用户可以：
 
-## State
+- 直接输入总金额。
+- 改用多条明细金额。
+- 输入参与者或人数。
+- 输入变化时立即看到结果。
+- 结果有效时复制摘要。
 
-No long-term state is needed. Current input values produce a current result object.
+无效输入和有效输入同样重要；无效时不能显示错误的人均金额。
 
-## Data
+## 状态
 
-All data stays in the page. There is no backend, database, payment, account, API, upload, leaderboard, or comments.
+这个项目不需要长期状态。当前输入值会生成一个当前结果对象。
 
-## Visual Completion
+这个结果对象应该同时驱动可见总额、人均金额、错误提示、摘要文字和复制按钮是否可用。
 
-Split Console uses:
+## 数据
 
-- blue console panels.
-- numeric emphasis.
-- visible invalid state.
-- copy feedback.
-- compact layout for under-one-minute completion.
+所有数据都停留在页面当前表单里。
 
-## Testing Complexity
+没有后端、数据库、支付、账号、API、上传、排行榜或评论。
 
-Invalid states matter as much as valid states. Tests confirm bad inputs show an error and do not display a wrong per-person result.
+## 视觉完成度
+
+Split Console 的完成感来自这些元素：
+
+- 蓝色控制台面板。
+- 明显的数字结果。
+- 可见的无效状态。
+- 复制后的反馈。
+- 小屏也能快速完成的紧凑布局。
+
+视觉重点是让人立刻知道“总共多少、每人多少、能不能复制”。

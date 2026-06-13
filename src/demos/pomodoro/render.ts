@@ -13,36 +13,46 @@ import {
   type PomodoroMode,
   type PomodoroState
 } from "./logic";
+import { dictionaries } from "../../i18n/dictionaries";
+import type { Locale } from "../../i18n/types";
 
 export type PomodoroDemoOptions = {
   durations?: PomodoroDurations;
   today?: string;
-};
-
-const modeLabels: Record<PomodoroMode, string> = {
-  focus: "Focus",
-  break: "Break"
+  locale?: Locale;
 };
 
 function dialOffset(progress: number): number {
   return Math.round(565.48 * (1 - progress));
 }
 
-function statusLabel(status: PomodoroState["status"]): string {
-  if (status === "idle") {
-    return "ready";
+function messageForState(state: PomodoroState, locale: Locale): string {
+  const copy = dictionaries[locale].demos.pomodoro.message;
+
+  if (state.status === "running") {
+    return state.mode === "focus" ? copy.focusRunning : copy.breakRunning;
   }
 
-  return status;
+  if (state.status === "paused") {
+    return copy.paused;
+  }
+
+  if (state.status === "complete") {
+    return state.mode === "focus" ? copy.focusComplete : copy.breakComplete;
+  }
+
+  return copy.idle;
 }
 
-export function renderPomodoroDemo(): string {
+export function renderPomodoroDemo(locale: Locale): string {
+  const copy = dictionaries[locale].demos.pomodoro;
+
   return `
     <section class="pomodoro-demo" data-testid="pomodoro-demo" aria-labelledby="pomodoro-title">
       <div class="pomodoro-demo__intro">
-        <p class="project-detail__motif">Solar Dial / 专注计时舱</p>
-        <h1 id="pomodoro-title">Focus Pomodoro</h1>
-        <p class="project-detail__lede">Start one focus round, watch the dial move, and keep today's completed count on this browser.</p>
+        <p class="project-detail__motif">${locale === "zh" ? "Solar Dial / 专注计时舱" : "Solar Dial"}</p>
+        <h1 id="pomodoro-title">${copy.title}</h1>
+        <p class="project-detail__lede">${copy.lede}</p>
       </div>
 
       <div class="pomodoro-demo__panel">
@@ -53,38 +63,38 @@ export function renderPomodoroDemo(): string {
           </svg>
           <div class="pomodoro-dial__center">
             <span data-testid="pomodoro-countdown" data-pomodoro-countdown>25:00</span>
-            <span data-pomodoro-mode-label>Focus mode</span>
+            <span data-pomodoro-mode-label>${copy.modeLabel.focus}</span>
           </div>
         </div>
 
-        <div class="pomodoro-controls" aria-label="Pomodoro controls">
-          <div class="pomodoro-mode-switch" role="group" aria-label="Timer mode">
-            <button class="pomodoro-mode-button" type="button" data-pomodoro-mode="focus" aria-pressed="true">Focus</button>
-            <button class="pomodoro-mode-button" type="button" data-pomodoro-mode="break" aria-pressed="false">Break</button>
+        <div class="pomodoro-controls" aria-label="${copy.controlsLabel}">
+          <div class="pomodoro-mode-switch" role="group" aria-label="${copy.modeGroupLabel}">
+            <button class="pomodoro-mode-button" type="button" data-pomodoro-mode="focus" aria-pressed="true">${copy.focus}</button>
+            <button class="pomodoro-mode-button" type="button" data-pomodoro-mode="break" aria-pressed="false">${copy.break}</button>
           </div>
 
           <div class="pomodoro-actions">
-            <button class="button button--primary" type="button" data-pomodoro-action="start">Start</button>
-            <button class="button button--secondary" type="button" data-pomodoro-action="pause">Pause</button>
-            <button class="button button--secondary" type="button" data-pomodoro-action="reset">Reset</button>
+            <button class="button button--primary" type="button" data-pomodoro-action="start">${copy.start}</button>
+            <button class="button button--secondary" type="button" data-pomodoro-action="pause">${copy.pause}</button>
+            <button class="button button--secondary" type="button" data-pomodoro-action="reset">${copy.reset}</button>
           </div>
 
-          <div class="pomodoro-progress" data-testid="pomodoro-progress" role="progressbar" aria-label="Timer progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="pomodoro-progress" data-testid="pomodoro-progress" role="progressbar" aria-label="${copy.progressLabel}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <span data-pomodoro-progress-fill></span>
           </div>
 
           <dl class="pomodoro-stats">
             <div>
-              <dt>Status</dt>
-              <dd data-testid="pomodoro-status" data-pomodoro-status>ready</dd>
+              <dt>${copy.status}</dt>
+              <dd data-testid="pomodoro-status" data-pomodoro-status>${copy.statusText.idle}</dd>
             </div>
             <div>
-              <dt>Completed Today</dt>
+              <dt>${copy.completedToday}</dt>
               <dd data-testid="pomodoro-completed-count" data-pomodoro-completed>0</dd>
             </div>
           </dl>
 
-          <p class="pomodoro-live" role="status" aria-live="polite" data-pomodoro-message>Ready to start.</p>
+          <p class="pomodoro-live" role="status" aria-live="polite" data-pomodoro-message>${copy.message.idle}</p>
         </div>
       </div>
     </section>
@@ -99,6 +109,8 @@ export function mountPomodoroDemo(options: PomodoroDemoOptions = {}): () => void
   }
 
   const durations = options.durations ?? DEFAULT_POMODORO_DURATIONS;
+  const locale = options.locale ?? "zh";
+  const copy = dictionaries[locale].demos.pomodoro;
   const today = options.today ?? getTodayKey();
   let state = createPomodoroState({ durations, today });
 
@@ -130,7 +142,7 @@ export function mountPomodoroDemo(options: PomodoroDemoOptions = {}): () => void
     }
 
     if (modeLabel) {
-      modeLabel.textContent = `${modeLabels[state.mode]} mode`;
+      modeLabel.textContent = copy.modeLabel[state.mode];
     }
 
     if (progress) {
@@ -146,7 +158,7 @@ export function mountPomodoroDemo(options: PomodoroDemoOptions = {}): () => void
     }
 
     if (status) {
-      status.textContent = statusLabel(state.status);
+      status.textContent = copy.statusText[state.status];
     }
 
     if (completed) {
@@ -154,7 +166,7 @@ export function mountPomodoroDemo(options: PomodoroDemoOptions = {}): () => void
     }
 
     if (message) {
-      message.textContent = state.message;
+      message.textContent = messageForState(state, locale);
     }
 
     for (const button of modeButtons) {
