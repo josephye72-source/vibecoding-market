@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,6 +42,16 @@ function readJsonFile<T>(repoPath: string): T {
   return JSON.parse(readRepoFile(repoPath)) as T;
 }
 
+type TsconfigShape = {
+  extends?: string;
+  compilerOptions?: {
+    lib?: string[];
+    types?: string[];
+  };
+  include?: string[];
+  exclude?: string[];
+};
+
 function extractMarkdownSection(content: string, heading: string): string {
   const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const startMatch = new RegExp(`^## ${escapedHeading}\\s*$`, "im").exec(content);
@@ -72,10 +80,36 @@ function expectHeading(content: string, heading: string): void {
 }
 
 describe("project documentation registry", () => {
-  it("keeps Node types scoped out of the browser app tsconfig", () => {
-    const tsconfig = readJsonFile<{ compilerOptions?: { types?: string[] } }>("tsconfig.json");
+  it("keeps browser app and test TypeScript programs separated", () => {
+    const appConfig = readJsonFile<TsconfigShape>("tsconfig.json");
+    const testConfigPath = resolve(repoRoot, "tsconfig.test.json");
 
-    expect(tsconfig.compilerOptions?.types ?? []).not.toContain("node");
+    expect(appConfig.compilerOptions?.lib ?? []).toEqual(
+      expect.arrayContaining(["DOM", "DOM.Iterable"])
+    );
+    expect(appConfig.compilerOptions?.types ?? []).not.toContain("node");
+    expect(appConfig.compilerOptions?.types ?? []).not.toContain("vitest/globals");
+    expect(appConfig.include ?? []).toEqual(["src/**/*.ts"]);
+    expect(appConfig.exclude ?? []).toEqual(
+      expect.arrayContaining(["src/**/*.test.ts", "src/test/**", "tests/**", "playwright.config.ts"])
+    );
+
+    expect(existsSync(testConfigPath)).toBe(true);
+
+    const testConfig = readJsonFile<TsconfigShape>("tsconfig.test.json");
+
+    expect(testConfig.extends).toBe("./tsconfig.json");
+    expect(testConfig.compilerOptions?.types ?? []).toEqual(
+      expect.arrayContaining(["vitest/globals", "node"])
+    );
+    expect(testConfig.include ?? []).toEqual(
+      expect.arrayContaining([
+        "src/**/*.test.ts",
+        "src/test/**/*.ts",
+        "tests/**/*.ts",
+        "playwright.config.ts"
+      ])
+    );
   });
 
   it("defines exactly five canonical doc links for every project", () => {
