@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { projects } from "../../src/data/projects";
 
 type ProjectLinks = {
@@ -7,8 +7,215 @@ type ProjectLinks = {
   docs?: string;
 };
 
+type ViewportCheck = {
+  label: string;
+  width: number;
+  height: number;
+};
+
+const homepageViewports: ViewportCheck[] = [
+  { label: "390px", width: 390, height: 900 },
+  { label: "768px", width: 768, height: 1000 },
+  { label: "1440px", width: 1440, height: 1000 }
+];
+
+const routeViewports: ViewportCheck[] = [
+  { label: "mobile", width: 390, height: 900 },
+  { label: "desktop", width: 1440, height: 1000 }
+];
+
 function linksFor(project: (typeof projects)[number]): ProjectLinks {
   return (project as { links?: ProjectLinks }).links ?? {};
+}
+
+async function expectMinimumTouchTarget(locator: Locator): Promise<void> {
+  const box = await locator.boundingBox();
+
+  expect(box, "control should have a visible bounding box").not.toBeNull();
+  expect(box?.width ?? 0, "control width should meet the 44px touch target").toBeGreaterThanOrEqual(
+    44
+  );
+  expect(
+    box?.height ?? 0,
+    "control height should meet the 44px touch target"
+  ).toBeGreaterThanOrEqual(44);
+}
+
+async function expectNoMainHorizontalOverflow(page: Page): Promise<void> {
+  const overflow = await page.evaluate(() => {
+    const main = document.querySelector("main");
+    const offenders = Array.from(document.querySelectorAll("main *"))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          className: element.className?.toString() ?? "",
+          tagName: element.tagName.toLowerCase(),
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width)
+        };
+      })
+      .filter((item) => item.width > 0 && (item.left < -1 || item.right > window.innerWidth + 1))
+      .slice(0, 5);
+
+    return {
+      bodyScrollWidth: document.body.scrollWidth,
+      documentScrollWidth: document.documentElement.scrollWidth,
+      mainClientWidth: main?.clientWidth ?? 0,
+      mainScrollWidth: main?.scrollWidth ?? 0,
+      offenders,
+      viewportWidth: window.innerWidth
+    };
+  });
+
+  expect(overflow.offenders, JSON.stringify(overflow, null, 2)).toEqual([]);
+  expect(overflow.documentScrollWidth, JSON.stringify(overflow, null, 2)).toBeLessThanOrEqual(
+    overflow.viewportWidth + 1
+  );
+  expect(overflow.bodyScrollWidth, JSON.stringify(overflow, null, 2)).toBeLessThanOrEqual(
+    overflow.viewportWidth + 1
+  );
+  expect(overflow.mainScrollWidth, JSON.stringify(overflow, null, 2)).toBeLessThanOrEqual(
+    overflow.mainClientWidth + 1
+  );
+}
+
+async function expectKeyboardFocusReachable(
+  page: Page,
+  target: Locator,
+  maxTabs = 32
+): Promise<void> {
+  await expect(target).toBeVisible();
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  });
+
+  for (let index = 0; index < maxTabs; index += 1) {
+    await page.keyboard.press("Tab");
+    const isFocused = await target.evaluate((element) => element === document.activeElement);
+
+    if (isFocused) {
+      const focusStyle = await target.evaluate((element) => {
+        const style = window.getComputedStyle(element);
+        return {
+          boxShadow: style.boxShadow,
+          outlineStyle: style.outlineStyle,
+          outlineWidth: style.outlineWidth
+        };
+      });
+
+      const hasOutline = focusStyle.outlineStyle !== "none" && focusStyle.outlineWidth !== "0px";
+      const hasHalo = focusStyle.boxShadow !== "none";
+
+      expect(hasOutline || hasHalo, JSON.stringify(focusStyle)).toBe(true);
+      return;
+    }
+  }
+
+  throw new Error(
+    `Expected ${await target.evaluate((element) => element.outerHTML)} to receive Tab focus`
+  );
+}
+
+async function prepareDemoRoute(page: Page, slug: string): Promise<void> {
+  if (slug === "focus-pomodoro") {
+    await page.addInitScript(() => {
+      window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
+    });
+  }
+
+  if (slug === "memory-cards") {
+    await page.addInitScript(() => {
+      window.__VCM_MEMORY_TEST_ORDER__ = [
+        "01",
+        "10",
+        "01",
+        "</>",
+        "10",
+        "</>",
+        "{}",
+        "=>",
+        "{}",
+        "[]",
+        "=>",
+        "[]"
+      ];
+    });
+  }
+
+  if (slug === "habit-grid") {
+    await page.clock.setFixedTime(new Date("2026-06-13T12:00:00"));
+  }
+
+  if (slug === "split-console") {
+    await page.addInitScript(() => {
+      window.__VCM_CLIPBOARD_WRITE__ = () => Promise.resolve();
+    });
+  }
+}
+
+async function exerciseDemoCoreControls(page: Page, slug: string): Promise<Locator> {
+  if (slug === "focus-pomodoro") {
+    const start = page.getByRole("button", { name: "Start" });
+    await expectMinimumTouchTarget(start);
+    await start.click();
+    await expect(page.getByTestId("pomodoro-status")).toContainText("running");
+    await page.getByRole("button", { name: "Pause" }).click();
+    await expect(page.getByTestId("pomodoro-status")).toContainText("paused");
+    await page.getByRole("button", { name: "Reset" }).click();
+    await expect(page.getByTestId("pomodoro-status")).toContainText("ready");
+    await page.getByRole("button", { name: "Break" }).click();
+    await expect(page.getByRole("button", { name: "Break" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    return start;
+  }
+
+  if (slug === "memory-cards") {
+    const restart = page.getByRole("button", { name: /restart game/i });
+    const firstCard = page.getByTestId("memory-card").first();
+    await expectMinimumTouchTarget(firstCard);
+    await firstCard.click();
+    await expect(firstCard.locator("span")).not.toHaveText("?");
+    await restart.click();
+    await expect(page.getByTestId("memory-moves")).toContainText("0");
+    return restart;
+  }
+
+  if (slug === "tiny-ledger") {
+    const amount = page.getByLabel("Amount");
+    const addFirst = page.getByRole("button", { name: /add first record/i });
+    const addRecord = page.getByRole("button", { name: /^Add record$/i });
+    await expectMinimumTouchTarget(addFirst);
+    await addFirst.click();
+    await expect(amount).toBeFocused();
+    await amount.fill("42");
+    await page.getByLabel("Note").fill("Mobile QA");
+    await addRecord.click();
+    await expect(page.getByTestId("ledger-record")).toHaveCount(1);
+    return amount;
+  }
+
+  if (slug === "habit-grid") {
+    const day = page.getByRole("button", { name: /^2026-06-13/ });
+    await expectMinimumTouchTarget(day);
+    await day.click();
+    await expect(page.getByTestId("habit-monthly-count")).toContainText("1");
+    return day;
+  }
+
+  const total = page.getByLabel("Total");
+  const copy = page.getByRole("button", { name: /copy summary/i });
+  await total.fill("90");
+  await page.getByLabel("Participants").fill("Ava, Bo, Cy");
+  await expect(page.getByTestId("split-per-person")).toContainText("$30.00");
+  await expectMinimumTouchTarget(copy);
+  await copy.click();
+  await expect(page.getByRole("status")).toContainText(/copied/i);
+  return total;
 }
 
 test("homepage first viewport renders site value, primary paths, tags, and cards", async ({
@@ -29,6 +236,22 @@ test("homepage renders a four-step beginner path", async ({ page }) => {
 
   await expect(page.getByTestId("beginner-path").locator("li")).toHaveCount(4);
 });
+
+for (const viewport of homepageViewports) {
+  test(`homepage is visually available at ${viewport.label}`, async ({ page }) => {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await page.goto("/");
+
+    await expect(page.getByRole("heading", { name: /Vibe Coding Market/i })).toBeVisible();
+    await expect(page.locator(".hero__lede")).toBeVisible();
+    await expect(page.locator(".hero").locator(`a[href="#/projects/${projects[0].slug}"]`)).toBeVisible();
+    await expect(page.getByTestId("project-card")).toHaveCount(5);
+
+    if (viewport.width === 390) {
+      await expectNoMainHorizontalOverflow(page);
+    }
+  });
+}
 
 for (const project of projects) {
   test(`project card for ${project.title} has the required summary and links`, async ({
@@ -64,6 +287,37 @@ for (const project of projects) {
     await expect(page.locator(`a[href="${linksFor(project).docs ?? ""}"]`)).toBeVisible();
   });
 
+  for (const viewport of routeViewports) {
+    test(`detail page for ${project.title} is responsive at ${viewport.label}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(`/#/projects/${project.slug}`);
+
+      await expect(page.getByRole("heading", { name: project.title })).toBeVisible();
+      await expect(page.getByTestId("project-detail-section")).toHaveCount(9);
+      await expect(page.locator(`a[href="${linksFor(project).demo ?? ""}"]`).first()).toBeVisible();
+      await expect(page.locator(`a[href="${linksFor(project).source ?? ""}"]`).first()).toBeVisible();
+      await expect(page.locator(`a[href="${linksFor(project).docs ?? ""}"]`).first()).toBeVisible();
+
+      if (viewport.width === 390) {
+        await expectNoMainHorizontalOverflow(page);
+      }
+    });
+
+    test(`demo for ${project.title} has core controls at ${viewport.label}`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await prepareDemoRoute(page, project.slug);
+      await page.goto(`/#/projects/${project.slug}/demo`);
+
+      await expect(page.getByRole("heading", { name: project.title })).toBeVisible();
+      const focusTarget = await exerciseDemoCoreControls(page, project.slug);
+
+      if (viewport.width === 390) {
+        await expectNoMainHorizontalOverflow(page);
+      }
+
+      await expectKeyboardFocusReachable(page, focusTarget);
+    });
+  }
 }
 
 test("project documentation links resolve from the static app", async ({ page }) => {
@@ -308,6 +562,68 @@ test("malformed and unknown section anchors do not break project rendering", asy
 
   expect(pageErrors).toEqual([]);
   expect(consoleErrors).toEqual([]);
+});
+
+test("keyboard Tab reaches homepage primary controls with visible focus", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto("/");
+
+  await expectKeyboardFocusReachable(
+    page,
+    page.locator(".hero").locator(`a[href="#/projects/${projects[0].slug}"]`)
+  );
+});
+
+test("route smoke has no console errors across home, detail, and demo routes", async ({ page }) => {
+  const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
+  const routes = [
+    "/",
+    ...projects.flatMap((project) => [
+      `/#/projects/${project.slug}`,
+      `/#/projects/${project.slug}/demo`
+    ])
+  ];
+
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      consoleErrors.push(`${page.url()}: ${message.text()}`);
+    }
+  });
+  page.on("pageerror", (error) => {
+    pageErrors.push(`${page.url()}: ${error.message}`);
+  });
+
+  for (const viewport of routeViewports) {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+    for (const route of routes) {
+      await prepareDemoRoute(page, route.split("/projects/")[1]?.split("/")[0] ?? "");
+      await page.goto(route);
+      await expect(page.locator("main")).toBeVisible();
+    }
+  }
+
+  expect(pageErrors).toEqual([]);
+  expect(consoleErrors).toEqual([]);
+});
+
+test("main content has no horizontal overflow at 390px on primary routes", async ({ page }) => {
+  const routes = [
+    "/",
+    ...projects.flatMap((project) => [
+      `/#/projects/${project.slug}`,
+      `/#/projects/${project.slug}/demo`
+    ])
+  ];
+
+  await page.setViewportSize({ width: 390, height: 900 });
+
+  for (const route of routes) {
+    await prepareDemoRoute(page, route.split("/projects/")[1]?.split("/")[0] ?? "");
+    await page.goto(route);
+    await expectNoMainHorizontalOverflow(page);
+  }
 });
 
 test("unknown routes render the fallback page", async ({ page }) => {
