@@ -26,6 +26,48 @@ function renderSection(title: string, body: string, sectionId: string, extraClas
   `;
 }
 
+function renderPomodoroDocLinks(): string {
+  return `
+    <ul class="doc-link-list">
+      <li><a href="/docs/projects/pomodoro/codex-from-zero.md">Codex From Zero</a></li>
+      <li><a href="/docs/projects/pomodoro/source-guide.md">Source Guide</a></li>
+      <li><a href="/docs/projects/pomodoro/complexity-map.md">Complexity Map</a></li>
+      <li><a href="/docs/projects/pomodoro/faq.md">FAQ</a></li>
+      <li><a href="/docs/projects/pomodoro/remix-prompts.md">Remix Prompts</a></li>
+    </ul>
+  `;
+}
+
+function renderOnlineDemoBody(project: Project): string {
+  if (project.slug === "focus-pomodoro") {
+    return `
+      <p>The Pomodoro demo is live. Open it to start, pause, reset, switch focus/break modes, complete a session, and verify today's count survives refresh.</p>
+      <a class="button button--primary" href="${escapeHtml(project.links.demo)}">Open Live Demo</a>
+    `;
+  }
+
+  return `
+    <p>This demo is still reserved for its implementation task. The route stays visible so the project loop is clear without pretending the placeholder is finished.</p>
+    <a class="button button--primary" href="${escapeHtml(project.links.demo)}">Open Pending Demo</a>
+  `;
+}
+
+function renderCodexDocBody(project: Project): string {
+  if (project.slug === "focus-pomodoro") {
+    return `
+      <p>Use these docs to rebuild, inspect, troubleshoot, and remix the Pomodoro from a blank folder.</p>
+      ${renderPomodoroDocLinks()}
+    `;
+  }
+
+  return `
+    <div>
+      <p>The reproduction doc will start from an empty folder and explain expected output, running steps, validation, and prompts.</p>
+      <p class="pending-note">This documentation will be completed in that project's closed-loop task.</p>
+    </div>
+  `;
+}
+
 export function findProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
@@ -53,10 +95,7 @@ export function renderProjectDetail(project: Project): string {
       )}
       ${renderSection(
         requiredSectionNames[1],
-        `
-          <p>这个 demo 的完整交互将在后续任务实现。当前路由先保留明确的实现中状态，避免把模板误当成可体验成品。</p>
-          <a class="button button--primary" href="${escapeHtml(project.links.demo)}">打开实现中 demo</a>
-        `,
+        renderOnlineDemoBody(project),
         "online-demo"
       )}
       ${renderSection(requiredSectionNames[2], renderList(project.learningGoals), "learning-goals")}
@@ -68,12 +107,7 @@ export function renderProjectDetail(project: Project): string {
       )}
       ${renderSection(
         requiredSectionNames[5],
-        `
-          <div>
-            <p>正式复现文档会从空文件夹开始，写清预期产出、运行方式、验收清单和每一步 Prompt。</p>
-            <p class="pending-note">文档内容将在后续项目闭环任务补齐。</p>
-          </div>
-        `,
+        renderCodexDocBody(project),
         "codex-doc"
       )}
       ${renderSection(

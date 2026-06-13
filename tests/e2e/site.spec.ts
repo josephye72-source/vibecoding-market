@@ -67,6 +67,8 @@ for (const project of projects) {
   test(`demo route for ${project.title} renders implementation pending state`, async ({
     page
   }) => {
+    test.skip(project.slug === "focus-pomodoro", "Focus Pomodoro has a real Task 4 demo.");
+
     const links = linksFor(project);
 
     await page.goto(`/${links.demo ?? `#/projects/${project.slug}/demo`}`);
@@ -75,6 +77,40 @@ for (const project of projects) {
     await expect(page.getByText("Task 3")).toBeVisible();
   });
 }
+
+test("focus pomodoro demo supports the closed-loop timer path", async ({ page }) => {
+  await page.goto("/#/projects/focus-pomodoro/demo?testDuration=2");
+
+  await expect(page.getByRole("heading", { name: /Focus Pomodoro/i })).toBeVisible();
+  await expect(page.getByText(/Solar Dial/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Reset" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Focus" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Break" })).toBeVisible();
+  await expect(page.getByTestId("pomodoro-countdown")).toBeVisible();
+  await expect(page.getByTestId("pomodoro-progress")).toBeVisible();
+
+  await page.getByRole("button", { name: "Break" }).click();
+  await expect(page.getByRole("button", { name: "Break" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Focus" }).click();
+
+  await page.getByRole("button", { name: "Start" }).click();
+  await expect(page.getByTestId("pomodoro-status")).toContainText("running");
+  await page.getByRole("button", { name: "Pause" }).click();
+  await expect(page.getByTestId("pomodoro-status")).toContainText("paused");
+  await page.getByRole("button", { name: "Reset" }).click();
+  await expect(page.getByTestId("pomodoro-status")).toContainText("ready");
+
+  await page.getByRole("button", { name: "Start" }).click();
+  await expect(page.getByRole("status")).toContainText("Focus session complete", {
+    timeout: 4000
+  });
+  await expect(page.getByTestId("pomodoro-completed-count")).toContainText("1");
+
+  await page.reload();
+  await expect(page.getByTestId("pomodoro-completed-count")).toContainText("1");
+});
 
 test("malformed and unknown section anchors do not break project rendering", async ({
   page

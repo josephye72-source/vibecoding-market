@@ -75,12 +75,12 @@ export const projects: Project[] = [
     sourceGuide: [
       "先看 src/demos/pomodoro/logic.ts，理解计时状态怎么变化。",
       "再看 src/demos/pomodoro/render.ts，找到按钮和进度条在哪里更新。",
-      "最后看 src/lib/storage.ts，确认本地记录如何安全读取。"
+      "最后看 docs/projects/pomodoro/source-guide.md，确认哪些位置适合新手先改。"
     ],
     promptSet: {
-      start: "从空文件夹开始，做一个纯 HTML/CSS/TS 番茄钟，包含开始、暂停、重置和进度显示。",
-      improve: "把完成一次专注后的今日次数保存到 localStorage，并在刷新后继续显示。",
-      debug: "如果倒计时没有停止，请检查 interval 是否在暂停和重置时被清理。"
+      start: "从空文件夹开始，做一个纯 HTML/CSS/TS 番茄钟，包含专注/休息模式、开始、暂停、重置、倒计时和进度显示。",
+      improve: "把完成一次专注后的今日次数保存到 localStorage，并在刷新后继续显示完成反馈。",
+      debug: "如果倒计时没有停止或重复加速，请检查 interval 是否在暂停、重置和路由切换时被清理。"
     },
     faq: [
       "为什么暂停后再次开始会跳秒？",
