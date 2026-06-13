@@ -1,4 +1,5 @@
 import { projects, type Project } from "../data/projects";
+import { getProjectDocs } from "../data/projectDocs";
 import { escapeHtml, renderProjectMeta, renderSkillTags } from "./ProjectMeta";
 
 const requiredSectionNames = [
@@ -26,20 +27,12 @@ function renderSection(title: string, body: string, sectionId: string, extraClas
   `;
 }
 
-function projectDocFolder(project: Project): string {
-  return project.docsFolder;
-}
-
 function renderProjectDocLinks(project: Project): string {
-  const folder = projectDocFolder(project);
+  const docs = getProjectDocs(project.slug);
 
   return `
     <ul class="doc-link-list">
-      <li><a href="/docs/projects/${folder}/codex-from-zero.md">Codex From Zero</a></li>
-      <li><a href="/docs/projects/${folder}/source-guide.md">Source Guide</a></li>
-      <li><a href="/docs/projects/${folder}/complexity-map.md">Complexity Map</a></li>
-      <li><a href="/docs/projects/${folder}/faq.md">FAQ</a></li>
-      <li><a href="/docs/projects/${folder}/remix-prompts.md">Remix Prompts</a></li>
+      ${docs.map((doc) => `<li><a href="${escapeHtml(doc.href)}">${escapeHtml(doc.label)}</a></li>`).join("")}
     </ul>
   `;
 }

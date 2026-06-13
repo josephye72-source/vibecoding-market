@@ -21,6 +21,7 @@ export type ProjectLinks = {
 
 export type Project = {
   slug: string;
+  order: number;
   docsFolder: string;
   links: ProjectLinks;
   title: string;
@@ -45,6 +46,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "focus-pomodoro",
+    order: 1,
     docsFolder: "pomodoro",
     links: {
       demo: "#/projects/focus-pomodoro/demo",
@@ -99,6 +101,7 @@ export const projects: Project[] = [
   },
   {
     slug: "memory-cards",
+    order: 2,
     docsFolder: "memory",
     links: {
       demo: "#/projects/memory-cards/demo",
@@ -153,6 +156,7 @@ export const projects: Project[] = [
   },
   {
     slug: "tiny-ledger",
+    order: 3,
     docsFolder: "ledger",
     links: {
       demo: "#/projects/tiny-ledger/demo",
@@ -207,6 +211,7 @@ export const projects: Project[] = [
   },
   {
     slug: "habit-grid",
+    order: 4,
     docsFolder: "habits",
     links: {
       demo: "#/projects/habit-grid/demo",
@@ -261,6 +266,7 @@ export const projects: Project[] = [
   },
   {
     slug: "split-console",
+    order: 5,
     docsFolder: "split",
     links: {
       demo: "#/projects/split-console/demo",

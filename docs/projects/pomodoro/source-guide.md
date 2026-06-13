@@ -44,6 +44,27 @@
 
    Edit the `.pomodoro-demo__panel`, `.pomodoro-dial__progress`, and `.pomodoro-mode-button[aria-pressed="true"]` rules in `app.css`.
 
+## Build Tool And Running
+
+This project uses Vite as a lightweight static frontend dev/build tool. For a beginner, Vite is the small helper that opens the app in a local browser, reloads when files change, and packages the plain web files for publishing.
+
+To run the project locally:
+
+```powershell
+npm install
+npm run dev
+```
+
+Then open the local URL that Vite prints and visit `/#/projects/focus-pomodoro/demo`.
+
+To check the publishable static build:
+
+```powershell
+npm run build
+```
+
+That command should finish without TypeScript or Vite errors.
+
 ## Safe Change Rule
 
 When editing the timer, keep this split:
