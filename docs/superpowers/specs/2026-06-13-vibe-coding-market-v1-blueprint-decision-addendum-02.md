@@ -67,17 +67,19 @@
 - 首次推送内容：当前 V1 项目完整代码、docs、source entry、README
 - 页面源码入口：可以继续保留 `/source/<project>/index.txt`，并在合适位置增加 GitHub 仓库入口
 
-当前阻塞：
+执行状态：
 
-- 本地没有 GitHub remote。
-- 当前环境中的 `gh` 命令不是官方 GitHub CLI，无法创建仓库。
-- GitHub App 连接器当前没有暴露创建仓库工具，也没有已安装账号或可访问仓库列表。
+- 官方 GitHub CLI 已安装并登录。
+- Public 仓库已创建：`https://github.com/josephye72-source/vibecoding-market`
+- 本地 `origin` 已配置到该仓库。
+- 当前分支 `v1-implementation` 已推送。
+- GitHub 仓库当前默认分支为 `v1-implementation`。
 
-因此，执行前需要满足任一条件：
+剩余交付边界：
 
-- 用户在 GitHub 上创建 `vibecoding-market` 空仓库后提供 remote；
-- 或用户安装并登录官方 GitHub CLI；
-- 或 GitHub App 安装到目标账号并提供可写仓库。
+- `/source/<project>/index.txt` 可以继续作为每个项目的站内源码索引。
+- 首页或源码相关区域仍应增加 GitHub 仓库入口。
+- 站点内入口属于 V1 执行团队的代码/内容修复项，不由 Strategy Session 直接改代码。
 
 ## 5. 首页长期项目地图表达
 
@@ -129,7 +131,7 @@
 
 1. 更新验收矩阵，反映本补充决策。
 2. 重新设计首页信息架构，让首页成为长期项目地图的第一版，而不是 5 个项目加一句未来文案。
-3. 补 GitHub 仓库创建与推送条件。
+3. 补站点内 GitHub 仓库入口。
 4. 修复并验证首页响应式、中文默认、英文切换、源码入口、反馈 pending。
 
 ## 7. 定版口径
