@@ -43,9 +43,9 @@ export function renderProjectDetail(project: Project): string {
           ${renderProjectMeta(project)}
           <div class="skill-tags">${renderSkillTags(project.skills)}</div>
           <div class="detail-actions">
-            <a class="button button--primary" href="#/projects/${project.slug}/demo">在线体验</a>
-            <a class="button button--secondary" href="#/projects/${project.slug}?section=source-guide">查看源代码</a>
-            <a class="button button--secondary" href="#/projects/${project.slug}?section=codex-doc">跟着 Codex 做</a>
+            <a class="button button--primary" href="${escapeHtml(project.links.demo)}">在线体验</a>
+            <a class="button button--secondary" href="${escapeHtml(project.links.source)}">查看源代码</a>
+            <a class="button button--secondary" href="${escapeHtml(project.links.docs)}">跟着 Codex 做</a>
           </div>
         `,
         "detail-header",
@@ -55,7 +55,7 @@ export function renderProjectDetail(project: Project): string {
         requiredSectionNames[1],
         `
           <p>这个 demo 的完整交互将在后续任务实现。当前路由先保留明确的实现中状态，避免把模板误当成可体验成品。</p>
-          <a class="button button--primary" href="#/projects/${project.slug}/demo">打开实现中 demo</a>
+          <a class="button button--primary" href="${escapeHtml(project.links.demo)}">打开实现中 demo</a>
         `,
         "online-demo"
       )}
@@ -139,7 +139,7 @@ export function renderDemoPending(project: Project): string {
 
 export function renderNotFound(): string {
   return `
-    <section class="not-found" aria-labelledby="not-found-title">
+    <section class="not-found" data-testid="not-found" aria-labelledby="not-found-title">
       <h1 id="not-found-title">没有找到这个项目</h1>
       <p>回到首页，从 5 个首发项目里重新选择。</p>
       <a class="button button--primary" href="#/">回到首页</a>

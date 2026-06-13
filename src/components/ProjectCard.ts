@@ -26,7 +26,7 @@ export function renderProjectCard(project: Project): string {
         ${renderSkillTags(project.skills)}
       </div>
       <div class="project-card__actions" aria-label="${escapeHtml(project.title)} links">
-        <a href="#/projects/${project.slug}/demo">在线体验</a>
+        <a href="${escapeHtml(project.links.demo)}">在线体验</a>
         <a href="#/projects/${project.slug}">查看详情</a>
       </div>
     </article>

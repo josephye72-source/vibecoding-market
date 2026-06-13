@@ -20,4 +20,14 @@ describe("V1 project metadata", () => {
       expect(project.visualMotif).toBeTruthy();
     }
   });
+
+  it("defines explicit demo, source, and docs links for every project", () => {
+    for (const project of projects) {
+      const links = (project as { links?: { demo?: string; source?: string; docs?: string } }).links;
+
+      expect(links?.demo).toBe(`#/projects/${project.slug}/demo`);
+      expect(links?.source).toBeTruthy();
+      expect(links?.docs).toBeTruthy();
+    }
+  });
 });
