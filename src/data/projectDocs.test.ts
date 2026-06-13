@@ -1,11 +1,28 @@
+/// <reference types="node" />
+
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { renderProjectDetail } from "../components/ProjectDetail";
 import { projectDocs, requiredProjectDocKinds } from "./projectDocs";
 import { projects } from "./projects";
 
-const repoRoot = resolve(".");
+function filePathFromImportMetaUrl(importMetaUrl: string): string {
+  const url = new URL(importMetaUrl);
+
+  if (url.protocol === "file:") {
+    return fileURLToPath(url);
+  }
+
+  if (url.pathname.startsWith("/@fs/")) {
+    return decodeURIComponent(url.pathname.slice("/@fs/".length));
+  }
+
+  throw new Error(`Unsupported import.meta.url for filesystem tests: ${importMetaUrl}`);
+}
+
+const repoRoot = resolve(dirname(filePathFromImportMetaUrl(import.meta.url)), "../..");
 
 const requiredDocs = [
   { kind: "codex-from-zero", fileName: "codex-from-zero.md", label: "Codex From Zero" },
@@ -21,6 +38,10 @@ function repoPathFor(projectFolder: string, fileName: string): string {
 
 function readRepoFile(repoPath: string): string {
   return readFileSync(resolve(repoRoot, repoPath), "utf8");
+}
+
+function readJsonFile<T>(repoPath: string): T {
+  return JSON.parse(readRepoFile(repoPath)) as T;
 }
 
 function extractMarkdownSection(content: string, heading: string): string {
@@ -51,6 +72,12 @@ function expectHeading(content: string, heading: string): void {
 }
 
 describe("project documentation registry", () => {
+  it("keeps Node types scoped out of the browser app tsconfig", () => {
+    const tsconfig = readJsonFile<{ compilerOptions?: { types?: string[] } }>("tsconfig.json");
+
+    expect(tsconfig.compilerOptions?.types ?? []).not.toContain("node");
+  });
+
   it("defines exactly five canonical doc links for every project", () => {
     expect(Object.keys(projectDocs).sort()).toEqual(projects.map((project) => project.slug).sort());
     expect(requiredProjectDocKinds).toEqual(requiredDocs.map((doc) => doc.kind));

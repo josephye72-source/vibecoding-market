@@ -77,6 +77,16 @@ test("project documentation links resolve from the static app", async ({ page })
   expect(await response.text()).toContain("Memory Cards Source Guide");
 });
 
+test("project documentation middleware rejects malformed and directory requests", async ({
+  page
+}) => {
+  const malformedResponse = await page.request.get("/docs/projects/%E0%A4%A");
+  expect(malformedResponse.status()).toBe(400);
+
+  const directoryResponse = await page.request.get("/docs/projects/memory");
+  expect(directoryResponse.status()).toBe(404);
+});
+
 test("focus pomodoro demo supports the closed-loop timer path", async ({ page }) => {
   await page.addInitScript(() => {
     window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
