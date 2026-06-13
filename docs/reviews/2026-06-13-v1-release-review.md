@@ -1,12 +1,13 @@
 # Vibe Coding Market V1 Release Review
 
 Date: 2026-06-13
-Reviewed commit: `bf89dd0beb2953b765c2ff41395ecc6f24c9918e`
+Reviewed package commit: `6907cd3a45effdf08db40ddf6c44a292b171081a`
+Product baseline commit: `bf89dd0beb2953b765c2ff41395ecc6f24c9918e`
 Package task: Task 8, V1 Release Review Package
 
 ## Release Recommendation
 
-Recommendation: Pass
+Recommendation: Pass for reviewed package commit `6907cd3a45effdf08db40ddf6c44a292b171081a`
 
 V1 is ready for a public release review and lightweight feedback collection. The recommendation is based on the checked V1 scope, the five-project static site boundary, Task 7 visual and accessibility QA, unit coverage, Playwright route and interaction coverage, and the absence of blocking release risks in this review package.
 
@@ -43,7 +44,7 @@ Primary scope evidence:
 | Phase 3, first project closed loop | Focus Pomodoro demo, detail page, source guide, Codex doc, FAQ, remix tasks, local record, no backend or API. | `src/demos/pomodoro/logic.ts`, `src/demos/pomodoro/render.ts`, `docs/projects/pomodoro/*`, `src/data/projects.ts` | `src/demos/pomodoro/logic.test.ts`; `tests/e2e/site.spec.ts` test `focus pomodoro demo supports the closed-loop timer path` | Task 7 sampled Focus Pomodoro on mobile and desktop detail and demo routes. | `docs/projects/pomodoro/codex-from-zero.md`; `docs/projects/pomodoro/source-guide.md` | Pass |
 | Phase 4, template solidification | Project detail template has 9 fixed sections; Codex docs and source docs use the same required registry and link rules; metadata template includes slug, order, roles, links, motif, skills, and docs folder. | `src/components/ProjectDetail.ts`, `src/data/projects.ts`, `src/data/projectDocs.ts`, `docs/projects/*/*` | `src/data/projectDocs.test.ts` tests `defines exactly five canonical doc links for every project`, `maps every canonical doc link to the static published href and existing repo file`, `keeps each project metadata record complete for V1`, `renders detail page links from project metadata and the centralized doc registry` | Shared detail route structure was checked at 390px and 1440px in Task 7. | Baseline spec section 5.4; `docs/reviews/2026-06-13-v1-visual-qa.md` | Pass |
 | Phase 5, remaining four projects | Memory Cards, Tiny Ledger, Habit Grid, and Split Console each have a demo, detail page, source entry, source guide, Codex doc, FAQ, remix prompts, motif, states, and local or page state feedback where required. | `src/demos/memory/*`, `src/demos/ledger/*`, `src/demos/habits/*`, `src/demos/split/*`, `docs/projects/memory/*`, `docs/projects/ledger/*`, `docs/projects/habits/*`, `docs/projects/split/*` | Unit tests under `src/demos/*/logic.test.ts`; Playwright tests `memory cards demo supports matching, mismatch feedback, victory, and restart`, `tiny ledger demo adds, deletes, totals, persists, and shows empty state`, `habit grid demo toggles a date, shows stats, and persists after refresh`, `split console demo calculates immediately, blocks invalid input, and copies summary` | Task 7 visual QA inspected all detail and demo routes at mobile 390px and desktop 1440px. | Baseline spec sections 5.5 and 8.2-8.5 | Pass |
-| Phase 6, site integration and pre-release acceptance | Complete homepage, 5 details, 5 demos, 5 source entries, 5 Codex docs, feedback entry, pre-release review, risk list, link integrity, responsive QA, console smoke, 5-minute manual QA note. | `src/components/HomePage.ts`, `src/components/AppShell.ts`, `src/components/ProjectDetail.ts`, `src/data/projectDocs.ts`, this file, `docs/reviews/2026-06-13-v1-feedback-plan.md` | `tests/e2e/site.spec.ts` tests `project documentation links resolve from the static app`, `route smoke has no console errors across home, detail, and demo routes`, `main content has no horizontal overflow at 390px on primary routes`; `npm run build`; `npm run test:e2e` | Task 7 visual QA reports route smoke, 390px/768px/1440px checks, no blocking visual issues, and accepted non-blocking browser-plugin limitation. | `docs/reviews/2026-06-13-v1-visual-qa.md`; `docs/reviews/2026-06-13-v1-accessibility-review.md`; `docs/reviews/2026-06-13-v1-feedback-plan.md` | Pass |
+| Phase 6, site integration and pre-release acceptance | Complete homepage, 5 details, 5 demos, 5 source entries, 5 Codex docs, feedback entry, pre-release review, risk list, link integrity, responsive QA, console smoke, 5-minute manual QA note. | `src/components/HomePage.ts`, `src/components/AppShell.ts`, `src/components/ProjectDetail.ts`, `src/data/projectDocs.ts`, this file, `docs/reviews/2026-06-13-v1-feedback-plan.md` | `tests/e2e/site.spec.ts` tests `project documentation links resolve from the static app`, `route smoke has no console errors across home, detail, and demo routes`, `main content has no horizontal overflow at 390px on primary routes`; `npm run build`; `npm run test:e2e` | Task 7 visual QA reports route smoke, 390px/768px/1440px checks, no blocking visual issues, and accepted non-blocking browser-plugin limitation. Controller timed exploratory smoke on 2026-06-13 covered 303 seconds against `http://127.0.0.1:5173` with no console errors, page errors, or blocking interaction errors. | `docs/reviews/2026-06-13-v1-visual-qa.md`; `docs/reviews/2026-06-13-v1-accessibility-review.md`; `docs/reviews/2026-06-13-v1-feedback-plan.md` | Pass |
 
 ## Core Deliverables Checklist
 
@@ -95,6 +96,18 @@ Accepted non-blocking limitations from Task 7:
 - No axe, Lighthouse, or full screen-reader transcript audit was added.
 - Cross-browser screenshot coverage beyond Chromium Playwright was not added.
 
+## Manual QA Smoke Note
+
+Controller timed smoke on 2026-06-13:
+
+| Field | Evidence |
+| --- | --- |
+| Method | Controller timed exploratory smoke using Playwright browser interactions against `http://127.0.0.1:5173`. |
+| Duration | 303 seconds. |
+| Viewports and routes | Mobile 390px homepage, all five project detail routes, all five demo routes, then desktop Split route; repeated home, memory, and split navigation until 5 minutes elapsed. |
+| Interactions | Pomodoro start, pause, and reset; Memory mismatch and restart; Ledger add record; Habit date toggle; Split calculation and copy. |
+| Result | No console errors, no page errors, and no blocking interaction errors. |
+
 ## Pre-Release Risk List
 
 | Risk | Severity | Evidence | Owner and next action | Blocker |
@@ -114,7 +127,8 @@ Run these before committing the release package:
 | `npm run build` | Pass on 2026-06-13. TypeScript app/test programs typechecked and Vite produced `dist/index.html`, CSS, and JS assets. |
 | `npm run test:e2e` | Pass on 2026-06-13. Equivalent to `npx playwright test`; Playwright reported 49 Chromium tests passed. |
 | `git diff --check` | Pass on 2026-06-13. No whitespace errors. |
-| `git status --short --branch` | Pass on 2026-06-13. Pre-commit status showed only Task 8 files: `package.json`, `README.md`, `docs/reviews/2026-06-13-v1-feedback-plan.md`, and `docs/reviews/2026-06-13-v1-release-review.md`. After commit, expected branch status is clean. |
+| `git status --short` | Pass on 2026-06-13. Pre-commit status showed only the release review evidence fix file: `docs/reviews/2026-06-13-v1-release-review.md`. After commit, expected short status is clean. |
+| `git status --short --branch` | Optional branch-aware check. Pass on 2026-06-13. After commit, expected branch status is clean. |
 
 ## Release Decision
 
