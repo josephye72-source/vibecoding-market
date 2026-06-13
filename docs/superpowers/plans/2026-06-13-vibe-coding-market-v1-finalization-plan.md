@@ -1,163 +1,164 @@
-# Vibe Coding Market V1 Finalization Implementation Plan
+# Vibe Coding Market V1.0 定版收口开发交付单
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> 给执行同事：请按任务逐项推进。建议使用 `superpowers:subagent-driven-development` 或 `superpowers:executing-plans` 分任务执行，并在每个任务完成后留下验证结果。
 
-**Goal:** Complete the final V1 public-beta pass by turning the homepage into the first version of the long-term project map, adding the public GitHub repository entry, preserving the V1 scope boundary, and preparing the accepted result to land on `main`.
+目标：完成 V1.0 公开测试版发布前的最后一轮收口，让首页真正呈现“长期项目地图第一版”，接入公开 GitHub 仓库入口，保持 V1 范围边界，并为最终进入 `main` 分支做准备。
 
-**Architecture:** Keep the app as a static Vite site with no backend, database, login, external API, search system, submission system, ranking, or community feature. Treat the homepage as a long-term map shell: current V1 projects are the first active lane, while future lanes are visible as prepared-but-not-active map areas. Keep existing project detail pages, demos, source text entries, and reproduction docs intact unless they need a link or copy adjustment for the GitHub entry.
+架构约束：继续保持静态 Vite 前端站点，不引入后端、数据库、登录、第三方 API、搜索系统、投稿系统、排行或社区功能。首页应被理解为长期项目地图的第一版：当前 5 个 V1 项目是已开放路径，未来项目类型以“准备中”方式轻量预留。
 
-**Tech Stack:** Vite, TypeScript, vanilla HTML rendering, CSS, Vitest, Playwright, GitHub public repository.
+技术栈：Vite、TypeScript、原生 HTML 渲染、CSS、Vitest、Playwright、GitHub 公开仓库。
 
 ---
 
-## 1. Ownership Boundary
+## 1. 职责边界
 
-This plan is for the V1 execution team. The Strategy Session owner does not modify product code in this phase.
+这份交付单给 V1 执行团队使用。策略会话负责人不直接修改产品代码，只负责产品基线、验收、仓库策略和最终版本判定。
 
-| Owner | Responsibilities |
+| 角色 | 职责 |
 |---|---|
-| User | Approve the visual direction before implementation; assign the execution team; decide when to publicly announce the public beta. |
-| V1 execution team | Modify homepage code, copy, styles, i18n, tests, and screenshots according to this handoff. |
-| Strategy Session owner | Maintain blueprint, roadmap, acceptance matrix, GitHub repository configuration, final acceptance report, and final `main` branch/default-branch setup after acceptance. |
+| 用户 | 审阅视觉方向，分配执行同事，决定公开发布时间。 |
+| V1 执行团队 | 修改首页、文案、样式、国际化、测试和截图证据。 |
+| 策略会话负责人 | 维护蓝图、验收矩阵、最终验收报告、GitHub 仓库配置和 `main` 分支收口。 |
 
-## 2. Decisions Already Made
+## 2. 已确定决策
 
-- Public release label: `V1.0 public beta`.
-- Do not claim that the path has been externally validated by real beginners yet.
-- Feedback entry remains pending and must not jump to X.
-- No V2/V3 functions in this pass: no search, filtering, user submission, ranking, comments, accounts, database, or community system.
-- Public GitHub repository already exists: `https://github.com/josephye72-source/vibecoding-market`.
-- Final accepted GitHub version must land on `main`; current implementation work may happen on a working branch, but public-facing stable code should not remain only on `v1-implementation`.
+- 公开发布标签使用“V1.0 公开测试版”。
+- 不宣称“已经被真实外部小白验证成立”。
+- 反馈入口继续保持准备中状态，不跳转 X。
+- 本轮不进入 V2，也不新增项目。
+- 不做搜索、筛选、投稿、排行榜、评论、账号、数据库或社区系统。
+- GitHub 仓库已经建立：`https://github.com/josephye72-source/vibecoding-market`。
+- 最终验收通过后，公开稳定版本必须落到 `main`，不能只停留在 `v1-implementation`。
 
-## 3. Recommended Visual Direction
+## 3. 视觉方向建议
 
-### Route A: Project Atlas / 轨道地图
+### 方案 A：轨道地图
 
-Recommendation: use Route A for V1 Finalization.
+推荐采用方案 A。
 
-Core idea:
+核心想法：
 
-- Homepage feels like a project atlas rather than a list of five cards.
-- Current V1 projects appear as the first active route.
-- Future project families appear as muted route nodes or lanes marked `准备中` / `Coming soon`.
-- The visual language borrows from metro maps, technical atlases, and studio wall maps, without becoming a dashboard or a course catalog.
+- 首页像一个项目地图，而不是 5 张项目卡片的集合。
+- 当前 V1 项目作为第一条已开放路径出现。
+- 未来项目类型作为较轻的路径节点或轨道出现，并标注“准备中”。
+- 视觉气质可以参考地铁线路图、技术地图、工作室墙面项目图谱，但不要做成后台仪表盘，也不要像课程销售页。
 
-Why it fits:
+为什么适合 V1：
 
-- It directly expresses the long-term project-map idea.
-- It can preserve the current high-visual V1 project cards.
-- It scales naturally into V2 paths without implementing V2 filtering now.
-- It avoids an Apple-like generic landing page and avoids a plain card grid.
+- 最直接表达“长期项目地图”。
+- 可以保留现有项目卡片的高视觉感。
+- 未来扩展到 V2 路径时有自然承接。
+- 不会落回“普通落地页 + 卡片列表”的形态。
 
-Must include:
+必须包含：
 
-- Active lane: V1 首批项目 / V1 first batch.
-- Future lanes: 游戏路径、实用工具、创作工具、学习辅助、数据小工具.
-- Status language: `已开放` for current V1, `准备中` for future lanes.
-- Lightweight map markers, lane lines, or route blocks.
-- No clickable fake filters or fake unavailable controls.
+- 已开放路径：`V1 首批项目`。
+- 未来路径：`游戏路径`、`实用工具`、`创作工具`、`学习辅助`、`数据小工具`。
+- 状态文案：当前项目使用 `已开放`，未来路径使用 `准备中`。
+- 轻量地图元素：线路、节点、路径块、状态标记均可。
+- 不做假筛选、不做假按钮、不做看起来可点但实际不可用的控件。
 
-### Route B: Studio Anthology / 策展图册
+### 方案 B：策展图册
 
-Use only if Route A feels too technical.
+只有在方案 A 显得过于技术化时再考虑。
 
-Core idea:
+核心想法：
 
-- Homepage feels like a curated creative anthology.
-- Current projects are presented as a first chapter.
-- Future project families become chapter tabs or issue sections marked `准备中`.
+- 首页像一本被策展的项目图册。
+- 当前项目是第一章节。
+- 未来类型作为后续章节显示“准备中”。
 
-Risk:
+风险：
 
-- Easier to slide back into “five polished project cards plus copy.”
-- Needs stronger structure to communicate the long-term map.
+- 容易又变成“5 张漂亮卡片 + 一句未来文案”。
+- 需要非常强的章节结构，才能表达长期地图。
 
-### Route C: Signal Console / 信号控制台
+### 方案 C：信号控制台
 
-Use only if the team wants a more technical expression.
+只有在团队想要更强科技感时再考虑。
 
-Core idea:
+核心想法：
 
-- Homepage feels like a controlled launch console for learning paths.
-- Current V1 projects are active signals; future paths are dimmed status modules.
+- 首页像一个学习路径控制台。
+- 当前 V1 项目是已激活信号。
+- 未来路径是较弱的准备中信号。
 
-Risk:
+风险：
 
-- Can become too dashboard-like and less welcoming for beginners.
-- Must avoid pretending there are live systems, accounts, or data feeds.
+- 容易变成后台系统或假数据面板。
+- 对小白可能不够友好。
 
-## 4. Files And Responsibilities
+## 4. 预计涉及文件
 
-Expected execution files:
+执行团队可根据现有代码结构调整，但原则上会涉及：
 
-- Modify `src/components/HomePage.ts`: restructure homepage sections and render the long-term map.
-- Modify `src/i18n/dictionaries.ts`: add Chinese and English copy for roadmap, statuses, GitHub entry, and future lanes.
-- Modify `src/i18n/types.ts` only if new localized structures need explicit typing.
-- Modify or create `src/data/homeRoadmap.ts`: centralize homepage roadmap lane data if this keeps `HomePage.ts` readable.
-- Modify `src/config/releaseChannels.ts`: add the public source repository URL if the execution team chooses config-based linking.
-- Modify `src/styles/app.css`: implement Route A visual structure, responsive layout, and remove or replace `.map-intent` as a thin copy-only module.
-- Modify `tests/e2e/site.spec.ts`: add E2E coverage for the long-term map, GitHub entry, feedback pending, and mobile layout.
-- Modify relevant unit tests if new data structures are created.
+- `src/components/HomePage.ts`：重构首页结构，渲染长期项目地图。
+- `src/i18n/dictionaries.ts`：增加中文和英文文案。
+- `src/i18n/types.ts`：如新增结构化文案类型，再补类型。
+- `src/data/homeRoadmap.ts`：可选。若首页地图数据较多，建议单独抽出。
+- `src/config/releaseChannels.ts`：可选。若集中管理 GitHub 仓库地址，可在这里或单独配置文件里增加。
+- `src/styles/app.css`：实现首页轨道地图、响应式布局和视觉状态。
+- `tests/e2e/site.spec.ts`：补首页地图、GitHub 入口、反馈准备中状态和移动端验证。
+- 相关单测：如果新增数据结构，需要补对应测试。
 
-Do not modify:
+不要修改：
 
-- Demo logic unless a failing test proves the finalization work broke a demo.
-- Project count.
-- Project detail structure except for a clearly needed GitHub link/copy adjustment.
-- Feedback functionality beyond preserving pending state.
+- 5 个演示项目的核心逻辑，除非本轮收口改动导致测试失败。
+- V1 项目数量。
+- 项目详情页 9 个固定区块结构，除非只是补 GitHub 入口相关文案。
+- 反馈提交功能。当前只允许准备中状态。
 
-## 5. Development Tasks
+## 5. 开发任务
 
-### Task 1: Confirm Baseline And Branch
+### 任务 1：确认基线和分支
 
-**Files:**
-- No product file changes.
+文件：不修改产品文件。
 
-- [ ] **Step 1: Confirm branch and clean state**
+- [ ] 步骤 1：确认工作区干净
 
-Run:
+运行：
 
 ```powershell
 git status -sb
 git branch --show-current
 ```
 
-Expected:
+预期：
 
-- Working tree is clean before implementation starts.
-- Work happens on a development branch, not directly on a public final branch.
+- 开始前工作区干净。
+- 开发可以在工作分支进行，不直接把未验收代码当成公开稳定版本。
 
-- [ ] **Step 2: Confirm current verification baseline**
+- [ ] 步骤 2：确认当前验证基线
 
-Run:
+运行：
 
 ```powershell
 npm run verify
 ```
 
-Expected:
+预期：
 
-- Existing tests pass before finalization changes begin.
+- 修改前测试通过，避免把旧问题混入本轮收口。
 
-### Task 2: Lock Product Requirements With Tests First
+### 任务 2：先用测试锁定产品要求
 
-**Files:**
-- Modify: `tests/e2e/site.spec.ts`
-- Optional Modify: `src/i18n/i18n.test.ts`
+文件：
 
-- [ ] **Step 1: Add or update homepage E2E requirements**
+- 修改：`tests/e2e/site.spec.ts`
+- 可选修改：`src/i18n/i18n.test.ts`
 
-Add Playwright expectations covering these behaviors:
+- [ ] 步骤 1：新增首页验收测试
 
-- Homepage contains a long-term project-map section, not only a single future-copy paragraph.
-- The map shows current V1 as active/open.
-- Future lanes are visible and marked as preparing/coming soon.
-- The old thin phrase-only module does not remain the only long-term map expression.
-- GitHub repository link is visible and points to `https://github.com/josephye72-source/vibecoding-market`.
-- Feedback entry remains pending and does not link to X.
-- Default locale remains Chinese and English switch still works.
+测试需要覆盖：
 
-Suggested test names:
+- 首页存在长期项目地图区，而不是只有一段未来文案。
+- 地图中有 V1 已开放路径。
+- 未来路径可见，并标注“准备中”。
+- GitHub 仓库入口可见，链接到 `https://github.com/josephye72-source/vibecoding-market`。
+- 反馈入口仍为准备中状态，不跳转 X。
+- 默认中文仍成立，英文切换仍成立。
+
+建议测试名称：
 
 ```ts
 test("homepage renders the long-term project atlas with active and future lanes", async ({ page }) => {
@@ -191,29 +192,30 @@ test("homepage exposes the public GitHub repository without replacing source ent
 });
 ```
 
-- [ ] **Step 2: Run the focused E2E tests and confirm they fail**
+- [ ] 步骤 2：确认新测试先失败
 
-Run:
+运行：
 
 ```powershell
 npx playwright test tests/e2e/site.spec.ts -g "project atlas|GitHub repository"
 ```
 
-Expected:
+预期：
 
-- New tests fail before implementation because the long-term atlas and GitHub entry are not yet present.
+- 新测试在实现前失败，说明测试确实锁住了本轮新增要求。
 
-### Task 3: Add Homepage Roadmap Data
+### 任务 3：增加首页地图数据
 
-**Files:**
-- Create or Modify: `src/data/homeRoadmap.ts`
-- Modify: `src/i18n/dictionaries.ts`
-- Modify: `src/i18n/types.ts` if needed
-- Test: `src/i18n/i18n.test.ts` or a new focused data test
+文件：
 
-- [ ] **Step 1: Define active and future lanes**
+- 创建或修改：`src/data/homeRoadmap.ts`
+- 修改：`src/i18n/dictionaries.ts`
+- 按需修改：`src/i18n/types.ts`
+- 测试：`src/i18n/i18n.test.ts` 或新增数据测试
 
-Recommended data shape:
+- [ ] 步骤 1：定义已开放和准备中路径
+
+推荐数据结构：
 
 ```ts
 export type HomeRoadmapLaneStatus = "open" | "preparing";
@@ -234,11 +236,11 @@ export const homeRoadmapLanes: HomeRoadmapLane[] = [
 ];
 ```
 
-The exact implementation may differ, but it must keep future lanes lightweight and non-interactive.
+这个结构只是建议，执行同事可以用更贴合现有代码的实现。关键是页面行为必须满足验收标准。
 
-- [ ] **Step 2: Add localized lane copy**
+- [ ] 步骤 2：增加中英文文案
 
-Chinese labels:
+中文至少包含：
 
 - `V1 首批项目`
 - `游戏路径`
@@ -250,7 +252,7 @@ Chinese labels:
 - `准备中`
 - `源码仓库`
 
-English labels:
+英文至少包含：
 
 - `V1 first batch`
 - `Game path`
@@ -262,69 +264,72 @@ English labels:
 - `Coming soon`
 - `Source repo`
 
-- [ ] **Step 3: Verify i18n remains complete**
+- [ ] 步骤 3：验证国际化完整性
 
-Run:
+运行：
 
 ```powershell
 npm run test:run -- src/i18n/i18n.test.ts
 ```
 
-Expected:
+预期：
 
-- Chinese and English dictionaries both include homepage, roadmap, feedback, project detail, and demo labels.
-- English project detail copy remains free of Chinese fallback text.
+- 中英文首页、反馈、项目详情和演示项目文案仍完整。
+- 英文模式主要 UI 不混入中文兜底文案。
 
-### Task 4: Rebuild Homepage Information Architecture
+### 任务 4：重构首页信息架构
 
-**Files:**
-- Modify: `src/components/HomePage.ts`
-- Modify: `src/styles/app.css`
-- Modify: `src/i18n/dictionaries.ts`
+文件：
 
-- [ ] **Step 1: Replace thin map-intent copy with an actual map section**
+- 修改：`src/components/HomePage.ts`
+- 修改：`src/styles/app.css`
+- 修改：`src/i18n/dictionaries.ts`
 
-The homepage should render these sections in this order:
+- [ ] 步骤 1：替换单薄的未来文案模块
 
-1. Long-term product hero.
-2. Project atlas / long-term map section.
-3. V1 first-batch projects.
-4. Rebuild path.
-5. Feedback pending entry.
+首页建议顺序：
 
-The project atlas section must have a stable test id:
+1. 长期产品首屏。
+2. 项目轨道地图。
+3. V1 首批项目。
+4. 复现路径。
+5. 反馈准备中入口。
+
+项目轨道地图必须提供稳定测试标记：
 
 ```html
 <section class="project-atlas" data-testid="project-atlas" aria-labelledby="project-atlas-title">
 ```
 
-- [ ] **Step 2: Keep the V1 first-batch section explicit**
+- [ ] 步骤 2：明确 V1 首批项目定位
 
-The project cards remain the current first batch. The copy must make clear:
+项目区文案必须表达：
 
-- these five are the first public-beta sample;
-- they do not define the long-term boundary of the site;
-- users can start with one project now.
+- 这 5 个项目是第一批公开测试样本；
+- 它们不是站点长期边界；
+- 用户现在可以从任一项目开始体验和复现。
 
-- [ ] **Step 3: Keep feedback pending**
+- [ ] 步骤 3：保持反馈准备中状态
 
-Feedback must remain a disabled or clearly pending entry:
+反馈区要求：
 
-- no X intent link;
-- no fake form;
-- no GitHub issue creation unless the product owner later approves it.
+- 不跳 X；
+- 不做假表单；
+- 不启用 GitHub Issue，除非之后产品层另行批准；
+- 可以说明未来收集：最感兴趣项目、是否愿意复现、卡住位置、二创想法。
 
-### Task 5: Add Public GitHub Repository Entry
+### 任务 5：接入公开 GitHub 仓库入口
 
-**Files:**
-- Modify: `src/config/releaseChannels.ts` or create a small source config file.
-- Modify: `src/components/HomePage.ts`
-- Modify: `src/i18n/dictionaries.ts`
-- Test: `tests/e2e/site.spec.ts`
+文件：
 
-- [ ] **Step 1: Add repository URL as centralized config**
+- 修改：`src/config/releaseChannels.ts` 或新增小型配置文件
+- 修改：`src/components/HomePage.ts`
+- 修改：`src/i18n/dictionaries.ts`
+- 测试：`tests/e2e/site.spec.ts`
 
-Recommended:
+- [ ] 步骤 1：集中配置仓库地址
+
+推荐：
 
 ```ts
 export const sourceRepository = {
@@ -332,203 +337,209 @@ export const sourceRepository = {
 } as const;
 ```
 
-- [ ] **Step 2: Add visible repository entry**
+- [ ] 步骤 2：增加可见入口
 
-The GitHub entry can appear in the hero action group or near the project atlas. It must be visible without making GitHub the primary CTA.
+GitHub 入口可以放在首屏行动区或项目地图附近，但不能压过“从第一个项目开始”的主行动。
 
-Requirements:
+要求：
 
-- Link text in Chinese mode includes `GitHub` or `源码仓库`.
-- Link text in English mode includes `GitHub` or `Source repo`.
-- Link opens the public repository.
-- Existing per-project source links stay as `/source/<project>/index.txt`.
+- 中文模式链接文字包含 `GitHub` 或 `源码仓库`。
+- 英文模式链接文字包含 `GitHub` 或 `Source repo`。
+- 链接打开公开仓库。
+- 每个项目原有 `/source/<project>/index.txt` 源码入口继续保留。
 
-- [ ] **Step 3: Confirm E2E coverage**
+- [ ] 步骤 3：确认测试覆盖
 
-Run:
+运行：
 
 ```powershell
 npx playwright test tests/e2e/site.spec.ts -g "GitHub repository"
 ```
 
-Expected:
+预期：
 
-- GitHub entry is visible and points to the public repo.
-- Per-project source entry remains the static source index.
+- GitHub 入口可见且指向公开仓库。
+- 项目详情页的“查看源码”仍指向静态源码索引。
 
-### Task 6: Implement Route A Visual System
+### 任务 6：实现方案 A 的视觉系统
 
-**Files:**
-- Modify: `src/styles/app.css`
-- Modify: `src/components/HomePage.ts`
+文件：
 
-- [ ] **Step 1: Build the atlas visual structure**
+- 修改：`src/styles/app.css`
+- 修改：`src/components/HomePage.ts`
 
-Use stable, responsive layout primitives:
+- [ ] 步骤 1：实现轨道地图结构
 
-- constrained inner width aligned with the rest of the homepage;
-- route lanes or map rows that do not rely on text wrapping for layout stability;
-- active and preparing states with clear visual distinction;
-- compact labels on mobile;
-- no nested cards inside cards.
+布局要求：
 
-- [ ] **Step 2: Visual style rules**
+- 与首页其他主体内容对齐；
+- 桌面端有清晰地图感；
+- 移动端不横向溢出；
+- `已开放` 和 `准备中` 状态视觉区分明确；
+- 状态标签和路径名称不能依赖过长文本撑开布局；
+- 不做卡片套卡片。
 
-The page must not become:
+- [ ] 步骤 2：视觉边界
 
-- a generic Apple-like landing page;
-- a one-hue purple/blue gradient page;
-- a dark dashboard with fake telemetry;
-- a plain blog/tutorial page;
-- a marketing course page.
+页面不能变成：
 
-Recommended expression:
+- 泛 Apple 风落地页；
+- 单一紫蓝渐变页面；
+- 假数据仪表盘；
+- 普通教程博客；
+- 课程销售页。
 
-- dark or neutral base may remain, but add enough contrast and secondary color variety;
-- lane markers can use the existing five project motif colors;
-- future lanes should be visible but quieter;
-- text must fit within all status chips and lane labels.
+推荐表达：
 
-- [ ] **Step 3: Remove `.map-intent` as a standalone weak module**
+- 可以保留深色或中性色底；
+- 使用现有 5 个项目视觉母题颜色作为轨道或节点辅助色；
+- 未来路径可见但更安静；
+- 文案和状态标签在 390px 移动端仍清楚。
 
-The existing `.map-intent` issue can be solved by replacement. If the class remains, it must be part of the unified atlas structure and aligned to the main content container.
+- [ ] 步骤 3：解决 `.map-intent` 问题
 
-### Task 7: Verify Responsive And Language Quality
+原来的 `.map-intent` 单薄模块应被替换。若保留同名 class，也必须纳入统一地图结构，并与主内容容器对齐。
 
-**Files:**
-- Test: `tests/e2e/site.spec.ts`
-- No direct product changes unless verification fails.
+### 任务 7：验证响应式和语言质量
 
-- [ ] **Step 1: Run full verification**
+文件：
 
-Run:
+- 测试：`tests/e2e/site.spec.ts`
+- 如验证失败，再修对应产品文件。
+
+- [ ] 步骤 1：跑完整验证
+
+运行：
 
 ```powershell
 npm run verify
 git diff --check
 ```
 
-Expected:
+预期：
 
-- Unit tests pass.
-- Build passes.
-- Playwright tests pass.
-- No whitespace errors.
+- 单测通过；
+- 构建通过；
+- Playwright 通过；
+- 无行尾空格或格式错误。
 
-- [ ] **Step 2: Screenshot-review these viewports**
+- [ ] 步骤 2：截图检查
 
-Required viewports:
+必须检查：
 
-- Desktop: `1440x1000`
-- Tablet: `768x1000`
-- Mobile: `390x900`
+- 桌面：`1440x1000`
+- 平板：`768x1000`
+- 移动端：`390x900`
 
-Check:
+检查点：
 
-- no horizontal overflow;
-- no overlapping text;
-- GitHub entry is visible and not primary over the first-project CTA;
-- future lanes read as placeholders, not fake features;
-- feedback remains pending;
-- Chinese default is coherent;
-- English switch does not leave mixed Chinese UI on main homepage controls.
+- 无横向滚动；
+- 无文本重叠；
+- GitHub 入口可见但不是主按钮；
+- 未来路径看起来是“准备中”，不是坏掉或假功能；
+- 反馈仍是准备中状态；
+- 中文默认体验完整；
+- 英文切换后首页主要控件不混中文。
 
-### Task 8: Development Handoff Evidence
+### 任务 8：给策略会话负责人回传证据
 
-**Files:**
-- Modify or create a short QA note under `docs/reviews/` only if the execution team normally records QA evidence.
+文件：
 
-- [ ] **Step 1: Provide evidence to Strategy Session**
+- 可选新增：`docs/reviews/` 下的 QA 记录。
 
-The execution team should send:
+- [ ] 步骤 1：提交执行证据
 
-- changed file list;
-- verification command results;
-- desktop and mobile screenshots;
-- note confirming no V2/V3 features were added;
-- note confirming `/source/<project>/index.txt` links still work;
-- note confirming GitHub link is present.
+执行团队完成后，回传：
 
-- [ ] **Step 2: Do not mark V1 public beta yourself**
+- 改动文件列表；
+- `npm run verify` 结果；
+- `git diff --check` 结果；
+- 桌面和移动端截图；
+- 确认没有新增 V2/V3 功能；
+- 确认 `/source/<project>/index.txt` 仍可访问；
+- 确认 GitHub 仓库入口已出现。
 
-The execution team should stop after implementation and evidence. Strategy Session performs acceptance and version-label decision.
+- [ ] 步骤 2：不要自行宣布 V1 公开测试版
 
-## 6. Acceptance Standards
+执行团队做到代码和证据即可。是否通过、是否进入 `main`、是否标记公开测试版，由策略会话负责人最终验收决定。
 
-### P0: Must Pass
+## 6. 验收标准
 
-- `npm run verify` passes.
-- `git diff --check` passes.
-- Default locale is Chinese.
-- English switch still works for homepage, project cards, project detail, and demos.
-- Five V1 projects remain present and unchanged in count.
-- Five demos remain playable.
-- Five project detail pages still have their fixed structure.
-- Five static source entries remain reachable.
-- Feedback entry remains pending and does not link to X.
-- No backend, database, login, payment, API, search, filtering, submission, ranking, comment, or community feature is introduced.
+### P0：必须通过
 
-### P1: Must Pass Before Public Beta
+- `npm run verify` 通过。
+- `git diff --check` 通过。
+- 默认语言是中文。
+- 英文切换仍覆盖首页、项目卡、详情页和演示项目主路径。
+- 5 个 V1 项目数量不变。
+- 5 个演示项目仍可体验。
+- 5 个项目详情页仍保留固定结构。
+- 5 个静态源码入口仍可访问。
+- 反馈入口仍为准备中状态，不跳 X。
+- 没有引入后端、数据库、登录、支付、API、搜索、筛选、投稿、排行、评论或社区功能。
 
-- Homepage visually reads as the first version of a long-term project map, not as a five-project-only site.
-- Route A or an approved visual route is implemented consistently across desktop and mobile.
-- Future project families are visible and clearly marked as preparing/coming soon.
-- V1 first batch is framed as the active starting lane.
-- GitHub public repository entry is visible and links to `https://github.com/josephye72-source/vibecoding-market`.
-- Per-project source links remain the static source index and are not replaced by a generic repository-only link.
-- `.map-intent` weak-copy module is removed or absorbed into the atlas structure without layout misalignment.
+### P1：公开测试版前必须通过
 
-### P2: Strongly Preferred Before Public Beta
+- 首页看起来是长期项目地图第一版，而不是只有 5 个项目的网站。
+- 方案 A 或用户批准的其他视觉路线在桌面和移动端都成立。
+- 未来项目类型可见，并明确标注 `准备中`。
+- V1 首批项目被表达为当前已开放路径。
+- GitHub 仓库入口可见，链接到 `https://github.com/josephye72-source/vibecoding-market`。
+- 每个项目的源码入口继续指向站内静态源码索引，而不是只剩一个总仓库链接。
+- 原 `.map-intent` 弱文案模块被替换或并入轨道地图结构，不再布局错位。
 
-- Homepage feels distinctive, not like a generic template.
-- Atlas labels remain readable at 390px.
-- GitHub entry is visible but secondary.
-- Future placeholders do not look broken, disabled by accident, or like unavailable paid features.
-- Homepage screenshots are clean enough to share in social media posts.
+### P2：强烈建议公开前通过
 
-## 7. Strategy Acceptance After Development
+- 首页有鲜明视觉记忆点，不像普通模板。
+- 390px 移动端路径标签仍可读。
+- GitHub 入口是清楚的次行动，不抢主行动。
+- 未来占位不会像坏掉的功能、付费功能或假按钮。
+- 首页截图足够干净，可以用于社交媒体发布。
 
-After the execution team finishes, Strategy Session will:
+## 7. 策略会话的最终验收动作
 
-1. Re-run or review `npm run verify`.
-2. Inspect desktop and mobile screenshots.
-3. Check the live homepage against V1 blueprint, addendum 02, and the final strategy acceptance matrix.
-4. Classify any gaps as blueprint change, implementation fix, or post-V1 work.
-5. Update `docs/reviews/acceptance/2026-06-13-v1-final-strategy-acceptance-matrix.md`.
-6. Create a final acceptance report if the version passes.
-7. Move the accepted public GitHub version to `main` and set GitHub default branch to `main`.
+执行团队完成后，策略会话负责人会做：
 
-## 8. Main Branch Policy
+1. 复核或重跑 `npm run verify`。
+2. 检查桌面和移动端截图。
+3. 对照 V1 蓝图、补充 02、最终策略验收矩阵检查首页。
+4. 把发现的问题分类为：蓝图变更、实现修复、后续版本事项。
+5. 更新 `docs/reviews/acceptance/2026-06-13-v1-final-strategy-acceptance-matrix.md`。
+6. 如果通过，新增最终验收报告。
+7. 将已验收公开测试版落到 `main`，并把 GitHub 默认分支设为 `main`。
 
-Current repository state:
+## 8. main 分支策略
 
-- GitHub repository: `https://github.com/josephye72-source/vibecoding-market`
-- Current pushed branch: `v1-implementation`
-- Current default branch before final acceptance: `v1-implementation`
+当前仓库状态：
 
-Final public-beta policy:
+- GitHub 仓库：`https://github.com/josephye72-source/vibecoding-market`
+- 当前已推送分支：`v1-implementation`
+- 当前默认分支：`v1-implementation`
 
-- Accepted public code must exist on `main`.
-- GitHub default branch must be `main`.
-- `v1-implementation` may remain as historical work branch or be deleted after `main` is confirmed.
-- Strategy Session owner handles this after acceptance, so execution developers do not need to force branch policy during implementation.
+最终公开测试版策略：
 
-## 9. Self-Review
+- 已验收代码必须存在于 `main`。
+- GitHub 默认分支必须设为 `main`。
+- `v1-implementation` 可以保留为历史工作分支，也可以在确认 `main` 稳定后删除。
+- 这件事由策略会话负责人在验收通过后处理，执行团队不需要在开发过程中强行切分支。
 
-Spec coverage:
+## 9. 自检结果
 
-- Long-term homepage map: covered by Tasks 2, 4, 6 and P1 acceptance.
-- GitHub entry: covered by Task 5 and P1 acceptance.
-- Feedback pending: covered by Tasks 4, 7 and P0 acceptance.
-- No V2/V3 scope creep: covered by Decisions, Task 6, P0 acceptance.
-- Main branch requirement: covered by Sections 7 and 8.
-- Public beta wording: covered by Decisions and Strategy Acceptance.
+需求覆盖：
 
-Placeholder scan:
+- 首页长期地图：任务 2、任务 4、任务 6 和 P1 验收覆盖。
+- GitHub 入口：任务 5 和 P1 验收覆盖。
+- 反馈准备中状态：任务 4、任务 7 和 P0 验收覆盖。
+- 不扩 V2/V3：第 2 节、任务 6 和 P0 验收覆盖。
+- `main` 分支要求：第 7 节和第 8 节覆盖。
+- 公开测试版表述：第 2 节和最终验收动作覆盖。
 
-- This plan uses no `TBD`, no deferred placeholder requirements, and no fake future controls.
+占位检查：
 
-Type consistency:
+- 本文没有待补占位项。
+- 未来功能只以 `准备中` 状态展示，不提供假交互。
 
-- Suggested `HomeRoadmapLane` fields are only a recommended implementation pattern.
-- Required externally visible contract is the homepage behavior and test coverage, not a mandatory internal type name.
+类型一致性：
+
+- `HomeRoadmapLane` 只是建议实现结构。
+- 最终必须满足的是页面行为和验收测试，不强制内部类型命名。
