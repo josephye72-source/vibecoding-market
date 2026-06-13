@@ -1,5 +1,7 @@
 # Vibe Coding Market V1 Implementation Plan
 
+> 状态更新，2026-06-13：本文件记录已完成的第一轮 V1 release candidate 实施计划。Gate 6 发布验收不通过后，后续执行不再以本计划继续推进，而应使用 `docs/superpowers/plans/2026-06-13-vibe-coding-market-v1-gate6-remediation-plan.md`。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the complete Vibe Coding Market 1.0 static web experience that satisfies `docs/superpowers/specs/2026-06-13-vibe-coding-market-v1-baseline-spec.md`.

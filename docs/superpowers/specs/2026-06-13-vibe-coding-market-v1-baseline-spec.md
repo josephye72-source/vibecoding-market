@@ -1,5 +1,10 @@
 # Vibe Coding Market 1.0 基准 Spec
 
+> 状态更新，2026-06-13：本文件是历史执行基线。Gate 6 发布验收不通过后，
+> 后续执行以 `docs/superpowers/specs/2026-06-13-vibe-coding-market-v1-blueprint-revision-01.md`
+> 和 `docs/superpowers/specs/2026-06-13-vibe-coding-market-v1-gate6-remediation-spec.md`
+> 为准。本文件仍可作为项目数量、纯 Web 边界、单项目 DoD、视觉交互底线的参考，但不再单独决定首页定位、语言系统、源码入口或反馈策略。
+
 日期：2026-06-13
 状态：基准草案，用户审阅通过后作为 V1 执行基线
 

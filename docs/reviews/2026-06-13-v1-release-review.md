@@ -1,5 +1,10 @@
 # Vibe Coding Market V1 Release Review
 
+> 状态更新，2026-06-13：这份 review 现在只作为历史技术证据保留。
+> 最终公开发布验收结论以
+> `docs/reviews/acceptance/2026-06-13-v1-gate6-release-acceptance-report.md`
+> 为准。当前验收结论：不建议公开发布，需先修复长期定位、整站信息架构、源码入口、反馈入口、语言与 i18n 阻塞项。
+
 Date: 2026-06-13
 Product baseline commit: `bf89dd0beb2953b765c2ff41395ecc6f24c9918e`
 Task 8 package commit: `6907cd3a45effdf08db40ddf6c44a292b171081a`

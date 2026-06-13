@@ -1,5 +1,7 @@
 # Vibe Coding Market 1.0 项目交付规划
 
+> 状态更新，2026-06-13：本文件是第一轮 V1 交付规划。Gate 6 发布验收不通过后，V1 的下一轮项目管理基线应以 `docs/superpowers/specs/2026-06-13-vibe-coding-market-v1-blueprint-revision-01.md`、`docs/superpowers/specs/2026-06-13-vibe-coding-market-v1-gate6-remediation-spec.md` 和 `docs/superpowers/plans/2026-06-13-vibe-coding-market-v1-gate6-remediation-plan.md` 为准。
+
 日期：2026-06-13
 状态：项目规划草案，等待用户确认
 
