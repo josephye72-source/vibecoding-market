@@ -1,8 +1,12 @@
 import { renderAppShell } from "./components/AppShell";
 import { renderHomePage } from "./components/HomePage";
 import { findProject, renderDemoPending, renderNotFound, renderProjectDetail } from "./components/ProjectDetail";
+import { mountHabitDemo, renderHabitDemo } from "./demos/habits/render";
+import { mountLedgerDemo, renderLedgerDemo } from "./demos/ledger/render";
+import { mountMemoryDemo, renderMemoryDemo } from "./demos/memory/render";
 import { mountPomodoroDemo, renderPomodoroDemo } from "./demos/pomodoro/render";
 import { DEFAULT_POMODORO_DURATIONS, type PomodoroDurations } from "./demos/pomodoro/logic";
+import { mountSplitDemo, renderSplitDemo } from "./demos/split/render";
 import { getRoute } from "./lib/router";
 import "./styles/tokens.css";
 import "./styles/base.css";
@@ -70,6 +74,22 @@ function renderRoute(path: string): string {
       return renderPomodoroDemo();
     }
 
+    if (project.slug === "memory-cards") {
+      return renderMemoryDemo();
+    }
+
+    if (project.slug === "tiny-ledger") {
+      return renderLedgerDemo();
+    }
+
+    if (project.slug === "habit-grid") {
+      return renderHabitDemo();
+    }
+
+    if (project.slug === "split-console") {
+      return renderSplitDemo();
+    }
+
     return renderDemoPending(project);
   }
 
@@ -88,6 +108,22 @@ function renderApp(): void {
 
   if (route.path === "/projects/focus-pomodoro/demo") {
     cleanupDemo = mountPomodoroDemo({ durations: getDemoDurations() });
+  }
+
+  if (route.path === "/projects/memory-cards/demo") {
+    cleanupDemo = mountMemoryDemo();
+  }
+
+  if (route.path === "/projects/tiny-ledger/demo") {
+    cleanupDemo = mountLedgerDemo();
+  }
+
+  if (route.path === "/projects/habit-grid/demo") {
+    cleanupDemo = mountHabitDemo();
+  }
+
+  if (route.path === "/projects/split-console/demo") {
+    cleanupDemo = mountSplitDemo();
   }
 
   if (route.anchor) {

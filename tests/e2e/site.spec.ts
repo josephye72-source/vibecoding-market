@@ -66,19 +66,6 @@ for (const project of projects) {
 
 }
 
-for (const project of projects.filter((project) => project.slug !== "focus-pomodoro")) {
-  test(`demo route for ${project.title} renders implementation pending state`, async ({
-    page
-  }) => {
-    const links = linksFor(project);
-
-    await page.goto(`/${links.demo ?? `#/projects/${project.slug}/demo`}`);
-
-    await expect(page.getByRole("heading", { name: `${project.title} Demo` })).toBeVisible();
-    await expect(page.getByText("Task 3")).toBeVisible();
-  });
-}
-
 test("focus pomodoro demo supports the closed-loop timer path", async ({ page }) => {
   await page.addInitScript(() => {
     window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
@@ -118,6 +105,143 @@ test("focus pomodoro demo supports the closed-loop timer path", async ({ page })
 
   await page.reload();
   await expect(page.getByTestId("pomodoro-completed-count")).toContainText("1");
+});
+
+test("memory cards demo supports matching, mismatch feedback, victory, and restart", async ({
+  page
+}) => {
+  await page.goto("/#/projects/memory-cards/demo");
+
+  await expect(page.getByRole("heading", { name: /Memory Cards/i })).toBeVisible();
+  await expect(page.getByText(/Neon Arcade Lab/i)).toBeVisible();
+  await expect(page.getByTestId("memory-card")).toHaveCount(12);
+  await expect(page.getByTestId("memory-moves")).toContainText("0");
+
+  const cards = page.getByTestId("memory-card");
+  const firstPair = await cards.nth(0).getAttribute("data-pair");
+  const secondPairIndex = await cards.evaluateAll((nodes, pair) =>
+    nodes.findIndex((node, index) => index > 0 && (node as HTMLElement).dataset.pair === pair),
+    firstPair
+  );
+  const mismatchIndex = await cards.evaluateAll((nodes, pair) =>
+    nodes.findIndex((node) => (node as HTMLElement).dataset.pair !== pair),
+    firstPair
+  );
+
+  await cards.nth(0).click();
+  await cards.nth(mismatchIndex).click();
+  await expect(page.getByRole("status")).toContainText(/try again/i);
+  await expect(page.getByTestId("memory-moves")).toContainText("1");
+  await page.waitForTimeout(700);
+
+  await cards.nth(0).click();
+  await cards.nth(secondPairIndex).click();
+  await expect(page.getByRole("status")).toContainText(/match/i);
+
+  const pairs = await cards.evaluateAll((nodes) =>
+    Array.from(new Set(nodes.map((node) => (node as HTMLElement).dataset.pair ?? "")))
+  );
+
+  for (const pair of pairs) {
+    const pairIndexes = await cards.evaluateAll((nodes, pairId) =>
+      nodes
+        .map((node, index) => ({ index, pairId: (node as HTMLElement).dataset.pair }))
+        .filter((entry) => entry.pairId === pairId)
+        .map((entry) => entry.index),
+      pair
+    );
+
+    for (const index of pairIndexes) {
+      const card = cards.nth(index);
+      if ((await card.getAttribute("aria-pressed")) !== "true") {
+        await card.click();
+      }
+    }
+  }
+
+  await expect(page.getByRole("status")).toContainText(/all pairs/i);
+  await page.getByRole("button", { name: /restart/i }).click();
+  await expect(page.getByTestId("memory-moves")).toContainText("0");
+});
+
+test("tiny ledger demo adds, deletes, totals, persists, and shows empty state", async ({
+  page
+}) => {
+  await page.goto("/#/projects/tiny-ledger/demo");
+
+  await expect(page.getByRole("heading", { name: /Tiny Ledger/i })).toBeVisible();
+  await expect(page.getByText(/Receipt Ledger/i)).toBeVisible();
+  await expect(page.getByTestId("ledger-empty")).toContainText(/No records yet/i);
+  await expect(page.getByRole("button", { name: /Add first record/i })).toBeVisible();
+
+  await page.getByLabel("Type").selectOption("income");
+  await page.getByLabel("Amount").fill("100");
+  await page.getByLabel("Category").selectOption("Work");
+  await page.getByLabel("Note").fill("Invoice");
+  await page.getByLabel("Date").fill("2026-06-13");
+  await page.getByRole("button", { name: /^Add record$/i }).click();
+
+  await page.getByLabel("Type").selectOption("expense");
+  await page.getByLabel("Amount").fill("35");
+  await page.getByLabel("Category").selectOption("Food");
+  await page.getByLabel("Note").fill("Dinner");
+  await page.getByLabel("Date").fill("2026-06-13");
+  await page.getByRole("button", { name: /^Add record$/i }).click();
+
+  await expect(page.getByTestId("ledger-record")).toHaveCount(2);
+  await expect(page.getByTestId("ledger-income")).toContainText("$100.00");
+  await expect(page.getByTestId("ledger-expense")).toContainText("$35.00");
+  await expect(page.getByTestId("ledger-balance")).toContainText("$65.00");
+
+  await page.reload();
+  await expect(page.getByTestId("ledger-record")).toHaveCount(2);
+
+  await page.getByRole("button", { name: /Delete Dinner/i }).click();
+  await expect(page.getByTestId("ledger-record")).toHaveCount(1);
+});
+
+test("habit grid demo toggles a date, shows stats, and persists after refresh", async ({
+  page
+}) => {
+  await page.goto("/#/projects/habit-grid/demo");
+
+  await expect(page.getByRole("heading", { name: /Habit Grid/i })).toBeVisible();
+  await expect(page.getByText(/Growth Grid/i)).toBeVisible();
+  await expect(page.getByTestId("habit-day")).toHaveCount(30);
+  await expect(page.getByTestId("habit-feedback")).toContainText(/No check-ins yet/i);
+
+  await page.getByRole("button", { name: /13/ }).first().click();
+
+  await expect(page.getByTestId("habit-monthly-count")).toContainText("1");
+  await expect(page.getByTestId("habit-feedback")).toContainText(/checked/i);
+
+  await page.reload();
+  await expect(page.getByTestId("habit-monthly-count")).toContainText("1");
+});
+
+test("split console demo calculates immediately, blocks invalid input, and copies summary", async ({
+  page
+}) => {
+  await page.goto("/#/projects/split-console/demo");
+
+  await expect(page.getByRole("heading", { name: /Split Console/i })).toBeVisible();
+  await expect(page.getByText(/Split Console \/ /i)).toBeVisible();
+
+  await page.getByLabel("Total").fill("120");
+  await page.getByLabel("Participants").fill("Ava, Bo, Cy");
+  await expect(page.getByTestId("split-per-person")).toContainText("$40.00");
+  await expect(page.getByTestId("split-summary")).toContainText("Ava, Bo, Cy");
+
+  await page.getByLabel("Total").fill("-1");
+  await expect(page.getByRole("alert")).toContainText(/positive total/i);
+  await expect(page.getByTestId("split-per-person")).toContainText("--");
+
+  await page.getByLabel("Total").fill("");
+  await page.getByLabel("Items").fill("12, 8\n10");
+  await page.getByLabel("Participants").fill("Ava, Bo");
+  await expect(page.getByTestId("split-per-person")).toContainText("$15.00");
+  await page.getByRole("button", { name: /Copy summary/i }).click();
+  await expect(page.getByRole("status")).toContainText(/copied/i);
 });
 
 test("malformed and unknown section anchors do not break project rendering", async ({

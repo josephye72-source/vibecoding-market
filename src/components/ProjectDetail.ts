@@ -26,45 +26,35 @@ function renderSection(title: string, body: string, sectionId: string, extraClas
   `;
 }
 
-function renderPomodoroDocLinks(): string {
+function projectDocFolder(project: Project): string {
+  return project.docsFolder;
+}
+
+function renderProjectDocLinks(project: Project): string {
+  const folder = projectDocFolder(project);
+
   return `
     <ul class="doc-link-list">
-      <li><a href="/docs/projects/pomodoro/codex-from-zero.md">Codex From Zero</a></li>
-      <li><a href="/docs/projects/pomodoro/source-guide.md">Source Guide</a></li>
-      <li><a href="/docs/projects/pomodoro/complexity-map.md">Complexity Map</a></li>
-      <li><a href="/docs/projects/pomodoro/faq.md">FAQ</a></li>
-      <li><a href="/docs/projects/pomodoro/remix-prompts.md">Remix Prompts</a></li>
+      <li><a href="/docs/projects/${folder}/codex-from-zero.md">Codex From Zero</a></li>
+      <li><a href="/docs/projects/${folder}/source-guide.md">Source Guide</a></li>
+      <li><a href="/docs/projects/${folder}/complexity-map.md">Complexity Map</a></li>
+      <li><a href="/docs/projects/${folder}/faq.md">FAQ</a></li>
+      <li><a href="/docs/projects/${folder}/remix-prompts.md">Remix Prompts</a></li>
     </ul>
   `;
 }
 
 function renderOnlineDemoBody(project: Project): string {
-  if (project.slug === "focus-pomodoro") {
-    return `
-      <p>The Pomodoro demo is live. Open it to start, pause, reset, switch focus/break modes, complete a session, and verify today's count survives refresh.</p>
-      <a class="button button--primary" href="${escapeHtml(project.links.demo)}">Open Live Demo</a>
-    `;
-  }
-
   return `
-    <p>This demo is still reserved for its implementation task. The route stays visible so the project loop is clear without pretending the placeholder is finished.</p>
-    <a class="button button--primary" href="${escapeHtml(project.links.demo)}">Open Pending Demo</a>
+    <p>The ${escapeHtml(project.title)} demo is live. Open it to try the core loop directly in the browser with no backend, login, database, or API.</p>
+    <a class="button button--primary" href="${escapeHtml(project.links.demo)}">Open Live Demo</a>
   `;
 }
 
 function renderCodexDocBody(project: Project): string {
-  if (project.slug === "focus-pomodoro") {
-    return `
-      <p>Use these docs to rebuild, inspect, troubleshoot, and remix the Pomodoro from a blank folder.</p>
-      ${renderPomodoroDocLinks()}
-    `;
-  }
-
   return `
-    <div>
-      <p>The reproduction doc will start from an empty folder and explain expected output, running steps, validation, and prompts.</p>
-      <p class="pending-note">This documentation will be completed in that project's closed-loop task.</p>
-    </div>
+    <p>Use these docs to rebuild, inspect, troubleshoot, and remix ${escapeHtml(project.title)} from a blank folder.</p>
+    ${renderProjectDocLinks(project)}
   `;
 }
 

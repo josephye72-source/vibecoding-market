@@ -21,6 +21,7 @@ export type ProjectLinks = {
 
 export type Project = {
   slug: string;
+  docsFolder: string;
   links: ProjectLinks;
   title: string;
   kind: ProjectKind;
@@ -44,6 +45,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     slug: "focus-pomodoro",
+    docsFolder: "pomodoro",
     links: {
       demo: "#/projects/focus-pomodoro/demo",
       source: "#/projects/focus-pomodoro?section=source-guide",
@@ -97,6 +99,7 @@ export const projects: Project[] = [
   },
   {
     slug: "memory-cards",
+    docsFolder: "memory",
     links: {
       demo: "#/projects/memory-cards/demo",
       source: "#/projects/memory-cards?section=source-guide",
@@ -150,6 +153,7 @@ export const projects: Project[] = [
   },
   {
     slug: "tiny-ledger",
+    docsFolder: "ledger",
     links: {
       demo: "#/projects/tiny-ledger/demo",
       source: "#/projects/tiny-ledger?section=source-guide",
@@ -203,6 +207,7 @@ export const projects: Project[] = [
   },
   {
     slug: "habit-grid",
+    docsFolder: "habits",
     links: {
       demo: "#/projects/habit-grid/demo",
       source: "#/projects/habit-grid?section=source-guide",
@@ -256,6 +261,7 @@ export const projects: Project[] = [
   },
   {
     slug: "split-console",
+    docsFolder: "split",
     links: {
       demo: "#/projects/split-console/demo",
       source: "#/projects/split-console?section=source-guide",
