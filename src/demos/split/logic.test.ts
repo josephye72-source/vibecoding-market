@@ -28,7 +28,30 @@ describe("Split Console logic", () => {
   });
 
   it("parses multiple item input from commas, spaces, or new lines", () => {
-    expect(parseItemAmounts("12, 8\n5  5.5")).toEqual([12, 8, 5, 5.5]);
+    expect(parseItemAmounts("12, 8\n5  5.5")).toEqual({
+      amounts: [12, 8, 5, 5.5],
+      error: null,
+      hasInput: true
+    });
+  });
+
+  it("rejects invalid or non-positive item tokens instead of silently filtering them", () => {
+    const parsed = parseItemAmounts("12, abc, -8, 8");
+
+    expect(parsed).toEqual({
+      amounts: [],
+      error: "Fix item amounts before calculating. Use positive numbers only.",
+      hasInput: true
+    });
+
+    const result = calculateSplit({
+      itemAmounts: parsed,
+      participants: ["Ava", "Bo"]
+    });
+
+    expect(result.isValid).toBe(false);
+    expect(result.error).toBe("Fix item amounts before calculating. Use positive numbers only.");
+    expect(result.perPerson).toBeNull();
   });
 
   it("blocks invalid input with a message and no wrong result", () => {

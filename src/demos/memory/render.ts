@@ -7,6 +7,12 @@ import {
   type MemoryState
 } from "./logic";
 
+declare global {
+  interface Window {
+    __VCM_MEMORY_TEST_ORDER__?: string[];
+  }
+}
+
 const feedbackCopy: Record<MemoryFeedback, string> = {
   ready: "Flip two cards to find a pair.",
   first: "Pick one more card.",
@@ -49,7 +55,11 @@ export function mountMemoryDemo(): () => void {
   const moves = root.querySelector<HTMLElement>("[data-testid='memory-moves']");
   const feedback = root.querySelector<HTMLElement>("[data-memory-feedback]");
   const restart = root.querySelector<HTMLButtonElement>("[data-memory-restart]");
-  let state = createMemoryGame();
+  const testOrder =
+    import.meta.env.DEV && Array.isArray(window.__VCM_MEMORY_TEST_ORDER__)
+      ? window.__VCM_MEMORY_TEST_ORDER__
+      : undefined;
+  let state = createMemoryGame({ orderedSymbols: testOrder });
   let mismatchTimer: number | undefined;
 
   function clearTimer(): void {
@@ -72,7 +82,6 @@ export function mountMemoryDemo(): () => void {
             type="button"
             data-testid="memory-card"
             data-memory-card="${card.id}"
-            data-pair="${card.pairId}"
             aria-label="${card.isFaceUp || card.isMatched ? `Card ${card.symbol}` : "Hidden memory card"}"
             aria-pressed="${card.isFaceUp || card.isMatched ? "true" : "false"}"
             ${state.isLocked || card.isMatched ? "disabled" : ""}
@@ -117,7 +126,7 @@ export function mountMemoryDemo(): () => void {
 
   restart?.addEventListener("click", () => {
     clearTimer();
-    state = restartMemoryGame(state);
+    state = testOrder ? createMemoryGame({ orderedSymbols: testOrder }) : restartMemoryGame(state);
     paint();
   });
 

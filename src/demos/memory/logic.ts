@@ -19,6 +19,7 @@ export type MemoryState = {
 
 export type MemoryOptions = {
   symbols?: string[];
+  orderedSymbols?: string[];
   random?: () => number;
 };
 
@@ -35,10 +36,31 @@ function shuffleCards(cards: MemoryCard[], random: () => number): MemoryCard[] {
   return shuffled;
 }
 
+function cardsFromOrderedSymbols(orderedSymbols: string[]): MemoryCard[] {
+  const pairIds = new Map<string, string>();
+
+  return orderedSymbols.map((symbol, index) => {
+    if (!pairIds.has(symbol)) {
+      pairIds.set(symbol, String(pairIds.size));
+    }
+
+    return {
+      id: `card-${index}`,
+      pairId: pairIds.get(symbol) ?? symbol,
+      symbol,
+      isFaceUp: false,
+      isMatched: false
+    };
+  });
+}
+
 export function createMemoryGame(options: MemoryOptions = {}): MemoryState {
   const symbols = (options.symbols ?? DEFAULT_MEMORY_SYMBOLS).slice(0, 6);
   const random = options.random ?? Math.random;
-  const cards = symbols.flatMap((symbol, pairIndex) => [
+  const cards = options.orderedSymbols
+    ? cardsFromOrderedSymbols(options.orderedSymbols)
+    : shuffleCards(
+        symbols.flatMap((symbol, pairIndex) => [
     {
       id: `${symbol}-${pairIndex}-a`,
       pairId: `${pairIndex}`,
@@ -53,10 +75,12 @@ export function createMemoryGame(options: MemoryOptions = {}): MemoryState {
       isFaceUp: false,
       isMatched: false
     }
-  ]);
+        ]),
+        random
+      ).map((card, index) => ({ ...card, id: `card-${index}` }));
 
   return {
-    cards: shuffleCards(cards, random),
+    cards,
     moves: 0,
     feedback: "ready",
     isLocked: false,

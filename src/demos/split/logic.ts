@@ -1,6 +1,12 @@
+export type ItemAmountParseResult = {
+  amounts: number[];
+  error: string | null;
+  hasInput: boolean;
+};
+
 export type SplitInput = {
   total?: number | null;
-  itemAmounts?: number[];
+  itemAmounts?: number[] | ItemAmountParseResult;
   people?: number | null;
   participants?: string[];
 };
@@ -18,11 +24,39 @@ function roundMoney(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-export function parseItemAmounts(value: string): number[] {
-  return value
+export const INVALID_ITEM_AMOUNT_MESSAGE =
+  "Fix item amounts before calculating. Use positive numbers only.";
+
+export function parseItemAmounts(value: string): ItemAmountParseResult {
+  const tokens = value
     .split(/[\s,]+/)
-    .map((part) => Number(part.trim()))
-    .filter((amount) => Number.isFinite(amount) && amount > 0);
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (tokens.length === 0) {
+    return {
+      amounts: [],
+      error: null,
+      hasInput: false
+    };
+  }
+
+  const amounts = tokens.map((token) => Number(token));
+  const hasInvalidAmount = amounts.some((amount) => !Number.isFinite(amount) || amount <= 0);
+
+  if (hasInvalidAmount) {
+    return {
+      amounts: [],
+      error: INVALID_ITEM_AMOUNT_MESSAGE,
+      hasInput: true
+    };
+  }
+
+  return {
+    amounts,
+    error: null,
+    hasInput: true
+  };
 }
 
 export function parseParticipants(value: string): string[] {
@@ -33,7 +67,22 @@ export function parseParticipants(value: string): string[] {
 }
 
 export function calculateSplit(input: SplitInput): SplitResult {
-  const itemTotal = (input.itemAmounts ?? []).reduce((sum, amount) => sum + amount, 0);
+  const itemInput = Array.isArray(input.itemAmounts)
+    ? { amounts: input.itemAmounts, error: null, hasInput: input.itemAmounts.length > 0 }
+    : input.itemAmounts;
+
+  if (itemInput?.error) {
+    return {
+      isValid: false,
+      total: null,
+      people: null,
+      perPerson: null,
+      participants: input.participants?.filter(Boolean) ?? [],
+      error: itemInput.error
+    };
+  }
+
+  const itemTotal = (itemInput?.amounts ?? []).reduce((sum, amount) => sum + amount, 0);
   const directTotal = Number(input.total);
   const total = Number.isFinite(directTotal) && directTotal > 0 ? directTotal : itemTotal;
   const participants = input.participants?.filter(Boolean) ?? [];

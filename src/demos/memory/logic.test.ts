@@ -68,13 +68,13 @@ describe("Memory Cards logic", () => {
 
   it("restarts with a fresh shuffled board and resets score", () => {
     let state = createMemoryGame({ symbols, random: fixedRandom([0]) });
-    const previousOrder = state.cards.map((card) => card.id);
+    const previousOrder = state.cards.map((card) => card.pairId);
 
     state = flipMemoryCard(state, state.cards[0].id);
     const restarted = restartMemoryGame(state, { random: fixedRandom([0.9, 0.1, 0.8, 0.2]) });
 
     expect(restarted.moves).toBe(0);
     expect(restarted.feedback).toBe("ready");
-    expect(restarted.cards.map((card) => card.id)).not.toEqual(previousOrder);
+    expect(restarted.cards.map((card) => card.pairId)).not.toEqual(previousOrder);
   });
 });

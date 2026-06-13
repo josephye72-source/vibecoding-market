@@ -44,6 +44,27 @@
 
    Edit `copyableSplitSummary` in `logic.ts`.
 
+## Build Tool And Running
+
+This project uses Vite as a lightweight static frontend dev/build tool. For a beginner, Vite is the small helper that opens the app in a local browser, reloads when files change, and packages the plain web files for publishing.
+
+Run locally:
+
+```powershell
+npm install
+npm run dev
+```
+
+Then open the local URL and visit `/#/projects/split-console/demo`.
+
+Build/check before sharing:
+
+```powershell
+npm run build
+```
+
+That command type-checks the TypeScript and creates a static `dist/` build.
+
 ## Safe Change Rule
 
 One result object should drive the visible total, per-person result, error, summary, and copy button state.

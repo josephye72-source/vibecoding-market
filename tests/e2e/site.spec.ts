@@ -110,53 +110,40 @@ test("focus pomodoro demo supports the closed-loop timer path", async ({ page })
 test("memory cards demo supports matching, mismatch feedback, victory, and restart", async ({
   page
 }) => {
+  await page.addInitScript(() => {
+    window.__VCM_MEMORY_TEST_ORDER__ = ["01", "10", "01", "</>", "10", "</>", "{}", "=>", "{}", "[]", "=>", "[]"];
+  });
   await page.goto("/#/projects/memory-cards/demo");
 
   await expect(page.getByRole("heading", { name: /Memory Cards/i })).toBeVisible();
   await expect(page.getByText(/Neon Arcade Lab/i)).toBeVisible();
   await expect(page.getByTestId("memory-card")).toHaveCount(12);
   await expect(page.getByTestId("memory-moves")).toContainText("0");
+  await expect(page.locator("[data-pair]")).toHaveCount(0);
 
   const cards = page.getByTestId("memory-card");
-  const firstPair = await cards.nth(0).getAttribute("data-pair");
-  const secondPairIndex = await cards.evaluateAll((nodes, pair) =>
-    nodes.findIndex((node, index) => index > 0 && (node as HTMLElement).dataset.pair === pair),
-    firstPair
-  );
-  const mismatchIndex = await cards.evaluateAll((nodes, pair) =>
-    nodes.findIndex((node) => (node as HTMLElement).dataset.pair !== pair),
-    firstPair
-  );
 
   await cards.nth(0).click();
-  await cards.nth(mismatchIndex).click();
+  await expect(cards.nth(0)).toContainText("01");
+  await cards.nth(1).click();
+  await expect(cards.nth(1)).toContainText("10");
   await expect(page.getByRole("status")).toContainText(/try again/i);
   await expect(page.getByTestId("memory-moves")).toContainText("1");
   await page.waitForTimeout(700);
 
   await cards.nth(0).click();
-  await cards.nth(secondPairIndex).click();
+  await cards.nth(2).click();
   await expect(page.getByRole("status")).toContainText(/match/i);
 
-  const pairs = await cards.evaluateAll((nodes) =>
-    Array.from(new Set(nodes.map((node) => (node as HTMLElement).dataset.pair ?? "")))
-  );
-
-  for (const pair of pairs) {
-    const pairIndexes = await cards.evaluateAll((nodes, pairId) =>
-      nodes
-        .map((node, index) => ({ index, pairId: (node as HTMLElement).dataset.pair }))
-        .filter((entry) => entry.pairId === pairId)
-        .map((entry) => entry.index),
-      pair
-    );
-
-    for (const index of pairIndexes) {
-      const card = cards.nth(index);
-      if ((await card.getAttribute("aria-pressed")) !== "true") {
-        await card.click();
-      }
-    }
+  for (const [first, second] of [
+    [1, 4],
+    [3, 5],
+    [6, 8],
+    [7, 10],
+    [9, 11]
+  ]) {
+    await cards.nth(first).click();
+    await cards.nth(second).click();
   }
 
   await expect(page.getByRole("status")).toContainText(/all pairs/i);
@@ -242,6 +229,11 @@ test("split console demo calculates immediately, blocks invalid input, and copie
   await expect(page.getByTestId("split-per-person")).toContainText("$15.00");
   await page.getByRole("button", { name: /Copy summary/i }).click();
   await expect(page.getByRole("status")).toContainText(/copied/i);
+
+  await page.getByLabel("Items").fill("12, abc, -8, 8");
+  await expect(page.getByRole("alert")).toContainText(/positive numbers only/i);
+  await expect(page.getByTestId("split-per-person")).toContainText("--");
+  await expect(page.getByRole("button", { name: /Copy summary/i })).toBeDisabled();
 });
 
 test("malformed and unknown section anchors do not break project rendering", async ({
