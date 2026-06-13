@@ -38,6 +38,7 @@ export function renderHabitDemo(): string {
             <div><dt>Current streak</dt><dd data-testid="habit-streak">0</dd></div>
           </dl>
           <p class="habit-feedback" data-testid="habit-feedback" role="status" aria-live="polite"></p>
+          <p class="habit-storage-status" data-habit-storage-status role="status" aria-live="polite"></p>
         </div>
         <div class="habit-grid" data-habit-grid aria-label="Habit calendar"></div>
       </div>
@@ -57,6 +58,7 @@ export function mountHabitDemo(): () => void {
   const count = root.querySelector<HTMLElement>("[data-testid='habit-monthly-count']");
   const streak = root.querySelector<HTMLElement>("[data-testid='habit-streak']");
   const feedback = root.querySelector<HTMLElement>("[data-testid='habit-feedback']");
+  const storageStatus = root.querySelector<HTMLElement>("[data-habit-storage-status]");
   let state: HabitState = createHabitState();
 
   function paint(): void {
@@ -75,6 +77,11 @@ export function mountHabitDemo(): () => void {
     if (feedback) {
       feedback.textContent = getHabitFeedback(state).message;
       feedback.dataset.state = getHabitFeedback(state).state;
+    }
+
+    if (storageStatus) {
+      storageStatus.textContent = state.message;
+      storageStatus.dataset.state = state.storageStatus;
     }
 
     if (!grid) {

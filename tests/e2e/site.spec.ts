@@ -66,6 +66,17 @@ for (const project of projects) {
 
 }
 
+test("project documentation links resolve from the static app", async ({ page }) => {
+  await page.goto("/#/projects/memory-cards");
+
+  const docLink = page.getByRole("link", { name: "Source Guide" });
+  await expect(docLink).toHaveAttribute("href", "/docs/projects/memory/source-guide.md");
+
+  const response = await page.request.get("/docs/projects/memory/source-guide.md");
+  expect(response.ok()).toBe(true);
+  expect(await response.text()).toContain("Memory Cards Source Guide");
+});
+
 test("focus pomodoro demo supports the closed-loop timer path", async ({ page }) => {
   await page.addInitScript(() => {
     window.__VCM_POMODORO_TEST_DURATIONS__ = { focus: 2, break: 2 };
@@ -175,21 +186,32 @@ test("tiny ledger demo adds, deletes, totals, persists, and shows empty state", 
   await page.getByLabel("Date").fill("2026-06-13");
   await page.getByRole("button", { name: /^Add record$/i }).click();
 
-  await expect(page.getByTestId("ledger-record")).toHaveCount(2);
-  await expect(page.getByTestId("ledger-income")).toContainText("$100.00");
+  await page.getByLabel("Amount").fill("1");
+  await page.getByLabel("Category").selectOption("Work");
+  await page.getByLabel("Note").fill("<img src=x onerror=alert(1)>");
+  await page.getByLabel("Date").fill("2026-06-13");
+  await page.getByRole("button", { name: /^Add record$/i }).click();
+
+  await expect(page.getByTestId("ledger-record")).toHaveCount(3);
+  await expect(page.getByTestId("ledger-income")).toContainText("$101.00");
   await expect(page.getByTestId("ledger-expense")).toContainText("$35.00");
-  await expect(page.getByTestId("ledger-balance")).toContainText("$65.00");
+  await expect(page.getByTestId("ledger-balance")).toContainText("$66.00");
+  await expect(
+    page.getByTestId("ledger-record").filter({ hasText: "<img src=x onerror=alert(1)>" })
+  ).toBeVisible();
+  await expect(page.locator("img")).toHaveCount(0);
 
   await page.reload();
-  await expect(page.getByTestId("ledger-record")).toHaveCount(2);
+  await expect(page.getByTestId("ledger-record")).toHaveCount(3);
 
   await page.getByRole("button", { name: /Delete Dinner/i }).click();
-  await expect(page.getByTestId("ledger-record")).toHaveCount(1);
+  await expect(page.getByTestId("ledger-record")).toHaveCount(2);
 });
 
 test("habit grid demo toggles a date, shows stats, and persists after refresh", async ({
   page
 }) => {
+  await page.clock.setFixedTime(new Date("2026-06-13T12:00:00"));
   await page.goto("/#/projects/habit-grid/demo");
 
   await expect(page.getByRole("heading", { name: /Habit Grid/i })).toBeVisible();
@@ -209,6 +231,9 @@ test("habit grid demo toggles a date, shows stats, and persists after refresh", 
 test("split console demo calculates immediately, blocks invalid input, and copies summary", async ({
   page
 }) => {
+  await page.addInitScript(() => {
+    window.__VCM_CLIPBOARD_WRITE__ = () => Promise.resolve();
+  });
   await page.goto("/#/projects/split-console/demo");
 
   await expect(page.getByRole("heading", { name: /Split Console/i })).toBeVisible();
@@ -234,6 +259,20 @@ test("split console demo calculates immediately, blocks invalid input, and copie
   await expect(page.getByRole("alert")).toContainText(/positive numbers only/i);
   await expect(page.getByTestId("split-per-person")).toContainText("--");
   await expect(page.getByRole("button", { name: /Copy summary/i })).toBeDisabled();
+});
+
+test("split console reports when clipboard copy is unavailable", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__VCM_CLIPBOARD_WRITE__ = () => Promise.reject(new Error("blocked"));
+  });
+  await page.goto("/#/projects/split-console/demo");
+
+  await page.getByLabel("Total").fill("60");
+  await page.getByLabel("Participants").fill("Ava, Bo");
+  await expect(page.getByTestId("split-summary")).toContainText("$30.00 each");
+  await page.getByRole("button", { name: /Copy summary/i }).click();
+  await expect(page.getByRole("status")).toContainText(/Copy unavailable/i);
+  await expect(page.getByTestId("split-summary")).toContainText("Ava, Bo");
 });
 
 test("malformed and unknown section anchors do not break project rendering", async ({

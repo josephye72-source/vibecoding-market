@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   HABIT_STORAGE_KEY,
   calculateHabitStreak,
@@ -55,6 +55,21 @@ describe("Habit Grid logic", () => {
 
     expect(loadHabitDays()).toEqual(state.checkedDates);
     expect(JSON.parse(localStorage.getItem(HABIT_STORAGE_KEY) ?? "[]")).toEqual(["2026-06-13"]);
+  });
+
+  it("keeps the toggled state and reports a warning when localStorage write fails", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("quota exceeded");
+    });
+
+    const state = toggleHabitDate(
+      createHabitState({ year: 2026, monthIndex: 5, today: "2026-06-13" }),
+      "2026-06-13"
+    );
+
+    expect(state.checkedDates).toEqual(["2026-06-13"]);
+    expect(state.storageStatus).toBe("failed");
+    expect(state.message).toBe("Check-in updated on screen, but it could not be saved in this browser.");
   });
 
   it("reports empty, checked, and streak feedback states", () => {

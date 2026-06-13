@@ -6,6 +6,12 @@ import {
   parseParticipants
 } from "./logic";
 
+declare global {
+  interface Window {
+    __VCM_CLIPBOARD_WRITE__?: (text: string) => Promise<void>;
+  }
+}
+
 export function renderSplitDemo(): string {
   return `
     <section class="split-demo" data-testid="split-demo" aria-labelledby="split-title">
@@ -101,13 +107,23 @@ export function mountSplitDemo(): () => void {
     }
 
     try {
-      await navigator.clipboard?.writeText(currentSummary);
-    } catch {
-      // The visible summary remains copyable even when clipboard permission is unavailable.
-    }
+      const writeText =
+        import.meta.env.DEV && window.__VCM_CLIPBOARD_WRITE__
+          ? window.__VCM_CLIPBOARD_WRITE__
+          : navigator.clipboard?.writeText?.bind(navigator.clipboard);
 
-    if (copyStatus) {
-      copyStatus.textContent = "Copied summary.";
+      if (!writeText) {
+        throw new Error("clipboard unavailable");
+      }
+
+      await writeText(currentSummary);
+      if (copyStatus) {
+        copyStatus.textContent = "Copied summary.";
+      }
+    } catch {
+      if (copyStatus) {
+        copyStatus.textContent = "Copy unavailable. Select the summary manually.";
+      }
     }
   });
 

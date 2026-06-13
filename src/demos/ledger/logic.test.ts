@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   LEDGER_CATEGORIES,
+  LEDGER_STORAGE_KEY,
   addLedgerRecord,
   calculateLedgerStats,
   createLedgerState,
@@ -89,6 +90,67 @@ describe("Tiny Ledger logic", () => {
 
     expect(loadLedgerRecords()).toEqual(state.records);
     expect(createLedgerState().records).toEqual(state.records);
+  });
+
+  it("filters malformed stored records before rendering them", () => {
+    localStorage.setItem(
+      LEDGER_STORAGE_KEY,
+      JSON.stringify([
+        {
+          id: "valid",
+          type: "income",
+          amount: 10,
+          category: "Work",
+          note: "Safe",
+          date: "2026-06-13"
+        },
+        {
+          id: "bad-negative",
+          type: "expense",
+          amount: -10,
+          category: "Food",
+          note: "Bad",
+          date: "2026-06-13"
+        },
+        {
+          id: "bad-type",
+          type: "gift",
+          amount: 10,
+          category: "Other",
+          note: "Bad",
+          date: "2026-06-13"
+        }
+      ])
+    );
+
+    expect(loadLedgerRecords()).toEqual([
+      {
+        id: "valid",
+        type: "income",
+        amount: 10,
+        category: "Work",
+        note: "Safe",
+        date: "2026-06-13"
+      }
+    ]);
+  });
+
+  it("keeps current add state and reports a warning when localStorage write fails", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("quota exceeded");
+    });
+
+    const state = addLedgerRecord(createLedgerState(), {
+      type: "income",
+      amount: 50,
+      category: "Work",
+      note: "Offline invoice",
+      date: "2026-06-13"
+    });
+
+    expect(state.records).toHaveLength(1);
+    expect(state.storageStatus).toBe("failed");
+    expect(state.message).toBe("Record updated on screen, but it could not be saved in this browser.");
   });
 
   it("returns a clear empty state with a prompt and primary action", () => {

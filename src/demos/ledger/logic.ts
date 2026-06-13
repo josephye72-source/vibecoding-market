@@ -13,6 +13,8 @@ export type LedgerInput = Omit<LedgerRecord, "id">;
 
 export type LedgerState = {
   records: LedgerRecord[];
+  storageStatus: "saved" | "failed" | "idle";
+  message: string;
 };
 
 export type LedgerStats = {
@@ -36,6 +38,8 @@ function safeRecords(value: unknown): LedgerRecord[] {
       typeof (record as LedgerRecord).id === "string" &&
       ((record as LedgerRecord).type === "income" || (record as LedgerRecord).type === "expense") &&
       typeof (record as LedgerRecord).amount === "number" &&
+      Number.isFinite((record as LedgerRecord).amount) &&
+      (record as LedgerRecord).amount > 0 &&
       typeof (record as LedgerRecord).category === "string" &&
       typeof (record as LedgerRecord).note === "string" &&
       typeof (record as LedgerRecord).date === "string"
@@ -50,13 +54,20 @@ export function loadLedgerRecords(): LedgerRecord[] {
   }
 }
 
-export function saveLedgerRecords(records: LedgerRecord[]): void {
-  localStorage.setItem(LEDGER_STORAGE_KEY, JSON.stringify(records));
+export function saveLedgerRecords(records: LedgerRecord[]): boolean {
+  try {
+    localStorage.setItem(LEDGER_STORAGE_KEY, JSON.stringify(records));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function createLedgerState(): LedgerState {
   return {
-    records: loadLedgerRecords()
+    records: loadLedgerRecords(),
+    storageStatus: "idle",
+    message: ""
   };
 }
 
@@ -79,8 +90,12 @@ export function addLedgerRecord(state: LedgerState, input: LedgerInput): LedgerS
     records: [...state.records, record]
   };
 
-  saveLedgerRecords(nextState.records);
-  return nextState;
+  const saved = saveLedgerRecords(nextState.records);
+  return {
+    ...nextState,
+    storageStatus: saved ? "saved" : "failed",
+    message: saved ? "Record saved in this browser." : "Record updated on screen, but it could not be saved in this browser."
+  };
 }
 
 export function deleteLedgerRecord(state: LedgerState, recordId: string): LedgerState {
@@ -88,8 +103,12 @@ export function deleteLedgerRecord(state: LedgerState, recordId: string): Ledger
     records: state.records.filter((record) => record.id !== recordId)
   };
 
-  saveLedgerRecords(nextState.records);
-  return nextState;
+  const saved = saveLedgerRecords(nextState.records);
+  return {
+    ...nextState,
+    storageStatus: saved ? "saved" : "failed",
+    message: saved ? "Record deleted and saved." : "Record updated on screen, but it could not be saved in this browser."
+  };
 }
 
 export function calculateLedgerStats(records: LedgerRecord[]): LedgerStats {

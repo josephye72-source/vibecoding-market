@@ -62,6 +62,7 @@ export function renderLedgerDemo(): string {
             <div><dt>Expense</dt><dd data-testid="ledger-expense">$0.00</dd></div>
             <div><dt>Balance</dt><dd data-testid="ledger-balance">$0.00</dd></div>
           </dl>
+          <p class="ledger-storage-status" data-ledger-storage-status role="status" aria-live="polite"></p>
           <div data-ledger-list></div>
         </div>
       </div>
@@ -81,7 +82,58 @@ export function mountLedgerDemo(): () => void {
   const income = root.querySelector<HTMLElement>("[data-testid='ledger-income']");
   const expense = root.querySelector<HTMLElement>("[data-testid='ledger-expense']");
   const balance = root.querySelector<HTMLElement>("[data-testid='ledger-balance']");
+  const storageStatus = root.querySelector<HTMLElement>("[data-ledger-storage-status]");
   let state: LedgerState = createLedgerState();
+
+  function renderEmptyState(container: HTMLElement): void {
+    const empty = getLedgerEmptyState();
+    const wrapper = document.createElement("div");
+    const message = document.createElement("p");
+    const action = document.createElement("button");
+
+    wrapper.className = "ledger-empty";
+    wrapper.dataset.testid = "ledger-empty";
+    message.textContent = empty.message;
+    action.className = "button button--secondary";
+    action.type = "button";
+    action.dataset.ledgerFocusAmount = "";
+    action.textContent = empty.actionLabel;
+
+    wrapper.append(message, action);
+    container.replaceChildren(wrapper);
+  }
+
+  function renderRecordList(container: HTMLElement): void {
+    const recordList = document.createElement("ul");
+    recordList.className = "ledger-list";
+    recordList.setAttribute("aria-label", "Ledger records");
+
+    for (const record of state.records) {
+      const item = document.createElement("li");
+      const textBlock = document.createElement("div");
+      const note = document.createElement("strong");
+      const meta = document.createElement("span");
+      const amount = document.createElement("b");
+      const deleteButton = document.createElement("button");
+
+      item.className = `ledger-record ledger-record--${record.type}`;
+      item.dataset.testid = "ledger-record";
+      note.textContent = record.note;
+      meta.textContent = `${record.category} - ${record.date}`;
+      amount.textContent = `${record.type === "expense" ? "-" : "+"}${formatMoney(record.amount)}`;
+      deleteButton.className = "button button--secondary";
+      deleteButton.type = "button";
+      deleteButton.dataset.ledgerDelete = record.id;
+      deleteButton.setAttribute("aria-label", `Delete ${record.note}`);
+      deleteButton.textContent = "Delete";
+
+      textBlock.append(note, meta);
+      item.append(textBlock, amount, deleteButton);
+      recordList.append(item);
+    }
+
+    container.replaceChildren(recordList);
+  }
 
   function paint(): void {
     const stats = calculateLedgerStats(state.records);
@@ -89,40 +141,21 @@ export function mountLedgerDemo(): () => void {
     if (income) income.textContent = formatMoney(stats.income);
     if (expense) expense.textContent = formatMoney(stats.expense);
     if (balance) balance.textContent = formatMoney(stats.balance);
+    if (storageStatus) {
+      storageStatus.textContent = state.message;
+      storageStatus.dataset.state = state.storageStatus;
+    }
 
     if (!list) {
       return;
     }
 
     if (state.records.length === 0) {
-      const empty = getLedgerEmptyState();
-      list.innerHTML = `
-        <div class="ledger-empty" data-testid="ledger-empty">
-          <p>${empty.message}</p>
-          <button class="button button--secondary" type="button" data-ledger-focus-amount>${empty.actionLabel}</button>
-        </div>
-      `;
+      renderEmptyState(list);
       return;
     }
 
-    list.innerHTML = `
-      <ul class="ledger-list" aria-label="Ledger records">
-        ${state.records
-          .map(
-            (record) => `
-              <li class="ledger-record ledger-record--${record.type}" data-testid="ledger-record">
-                <div>
-                  <strong>${record.note}</strong>
-                  <span>${record.category} · ${record.date}</span>
-                </div>
-                <b>${record.type === "expense" ? "-" : "+"}${formatMoney(record.amount)}</b>
-                <button class="button button--secondary" type="button" data-ledger-delete="${record.id}" aria-label="Delete ${record.note}">Delete</button>
-              </li>
-            `
-          )
-          .join("")}
-      </ul>
-    `;
+    renderRecordList(list);
   }
 
   form?.addEventListener("submit", (event) => {

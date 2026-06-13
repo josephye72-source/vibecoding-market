@@ -12,6 +12,8 @@ export type HabitState = {
   today: string;
   checkedDates: string[];
   days: HabitDay[];
+  storageStatus: "saved" | "failed" | "idle";
+  message: string;
 };
 
 export type HabitOptions = {
@@ -44,8 +46,13 @@ export function loadHabitDays(): string[] {
   }
 }
 
-export function saveHabitDays(checkedDates: string[]): void {
-  localStorage.setItem(HABIT_STORAGE_KEY, JSON.stringify(checkedDates));
+export function saveHabitDays(checkedDates: string[]): boolean {
+  try {
+    localStorage.setItem(HABIT_STORAGE_KEY, JSON.stringify(checkedDates));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function createHabitState(options: HabitOptions = {}): HabitState {
@@ -72,7 +79,9 @@ export function createHabitState(options: HabitOptions = {}): HabitState {
     monthIndex,
     today,
     checkedDates,
-    days
+    days,
+    storageStatus: "idle",
+    message: ""
   };
 }
 
@@ -86,14 +95,21 @@ export function toggleHabitDate(state: HabitState, date: string): HabitState {
   }
 
   const checkedDates = Array.from(checked).sort();
-  saveHabitDays(checkedDates);
-
-  return createHabitState({
+  const saved = saveHabitDays(checkedDates);
+  const nextState = createHabitState({
     year: state.year,
     monthIndex: state.monthIndex,
     today: state.today,
     checkedDates
   });
+
+  return {
+    ...nextState,
+    storageStatus: saved ? "saved" : "failed",
+    message: saved
+      ? "Check-in saved in this browser."
+      : "Check-in updated on screen, but it could not be saved in this browser."
+  };
 }
 
 export function calculateMonthlyCount(state: HabitState): number {
